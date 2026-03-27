@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Centre Test</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Mock data
+        const MOCK_FIXTURES = [
+            { homeTeam: "Man City", awayTeam: "Liverpool", date: "Today", time: "20:00", status: "upcoming", score: "0 - 0" },
+            { homeTeam: "Arsenal", awayTeam: "Chelsea", date: "Tomorrow", time: "15:00", status: "upcoming", score: "0 - 0" }
+        ];
+
+        const STADIUMS = {
+            "Arsenal": { lat: 51.5549, lng: -0.1084 },
+            "Man City": { lat: 53.4831, lng: -2.2004 },
+        };
+
+        const WeatherCentre = ({ fixtures }) => {
+            const [selectedMatch, setSelectedMatch] = useState(null);
+            const [weather, setWeather] = useState(null);
+            const [loading, setLoading] = useState(false);
+
+            useEffect(() => {
+                if (fixtures.length > 0 && !selectedMatch) {
+                    handleMatchSelect(fixtures[0].homeTeam);
+                }
+            }, [fixtures]);
+
+            const handleMatchSelect = async (homeTeam) => {
+                const match = fixtures.find(f => f.homeTeam === homeTeam);
+                if (!match) return;
+                
+                setSelectedMatch(match);
+                setLoading(true);
+                setWeather(null);
+
+                const stadiumKey = Object.keys(STADIUMS).find(k => homeTeam.includes(k) || k.includes(homeTeam));
+                
+                if (stadiumKey) {
+                    const { lat, lng } = STADIUMS[stadiumKey];
+                    try {
+                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,precipitation,wind_speed_10m,cloud_cover&wind_speed_unit=mph`);
+                        const data = await res.json();
+                        setWeather(data.current);
+                    } catch (e) {
+                        console.error("Weather error", e);
+                        setWeather({ temperature_2m: 12, wind_speed_10m: 15, precipitation: 0 });
+                    }
+                } else {
+                    setWeather({ temperature_2m: 10, wind_speed_10m: 10, precipitation: 0 });
+                }
+                setLoading(false);
+            };
+
+            const getVerdict = (w) => {
+                if (w.precipitation > 0.5) return "Slick surface. Get the studs in. Sliding tackles galore.";
+                if (w.wind_speed_10m > 15) return "Keeper's nightmare. Keep it on the deck.";
+                if (w.temperature_2m > 20) return "Water breaks imminent. Legs will go after 60 mins.";
+                return "Perfect track. No excuses today.";
+            };
+
+            return (
+                <section className="py-12 bg-slate-900 text-white relative border-y-4 border-[#d4af37]">
+                    <div className="container mx-auto px-4">
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                            <h2 className="text-3xl font-black uppercase text-[#d4af37]">
+                                <i className="fas fa-cloud-sun-rain mr-3"></i> The Gaffer's Pitch Report
+                            </h2>
+                            
+                            <select 
+                                className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white font-bold w-full md:w-auto"
+                                onChange={(e) => handleMatchSelect(e.target.value)}
+                                value={selectedMatch?.homeTeam || ""}
+                            >
+                                <option value="" disabled>Select a match...</option>
+                                {fixtures.map((f, i) => (
+                                    <option key={i} value={f.homeTeam} className="text-black">
+                                        {f.homeTeam} vs {f.awayTeam}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="max-w-4xl mx-auto">
+                            <div className="bg-[#1a472a] rounded-xl p-8 shadow-2xl border-2 border-white/10 min-h-[300px]">
+                                {loading ? (
+                                   <div className="h-64 flex items-center justify-center text-[#d4af37] animate-pulse text-xl">
+                                     Checking the skies...
+                                   </div>
+                                ) : selectedMatch && weather ? (
+                                   <div className="grid md:grid-cols-2 gap-8 items-center">
+                                       <div className="text-center md:text-left">
+                                          <div className="text-sm font-bold text-white/50 uppercase tracking-widest mb-2">{selectedMatch.homeTeam} Stadium</div>
+                                          <div className="text-6xl font-black text-white mb-2">{Math.round(weather.temperature_2m)}°C</div>
+                                          <div className="flex flex-wrap gap-4 justify-center md:justify-start text-sm font-bold text-[#d4af37] font-mono">
+                                             <span className="bg-black/30 px-3 py-1 rounded"><i className="fas fa-wind mr-2"></i> {weather.wind_speed_10m} mph</span>
+                                             <span className="bg-black/30 px-3 py-1 rounded"><i className="fas fa-tint mr-2"></i> {weather.precipitation} mm</span>
+                                          </div>
+                                       </div>
+
+                                       <div className="bg-white/5 rounded-lg p-6 border-l-4 border-[#d4af37]">
+                                          <h3 className="text-[#d4af37] font-black uppercase text-sm mb-2">The Gaffer's Verdict</h3>
+                                          <p className="text-xl font-bold italic leading-relaxed mb-4">
+                                             "{getVerdict(weather)}"
+                                          </p>
+                                       </div>
+                                   </div>
+                                ) : (
+                                   <div className="h-64 flex flex-col items-center justify-center text-white/50 gap-4">
+                                      <i className="fas fa-cloud-moon text-4xl opacity-50"></i>
+                                      <p>Weather Centre Initializing...</p>
+                                   </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const App = () => {
+            return <WeatherCentre fixtures={MOCK_FIXTURES} />;
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

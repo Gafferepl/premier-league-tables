@@ -1,0 +1,74 @@
+# IRON-CLAD SECURITY PROTECTION
+# Prevent access to sensitive documentation and IP
+
+# Block access to all .md files
+<FilesMatch "\.(md|txt|secret|private|internal)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to private directories
+<Directory ".private">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+<Directory "docs/internal">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+<Directory "docs/private">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+# Block access to specific sensitive files
+<Files "AI_CHAT_IMPLEMENTATION.md">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "CACHING_STRATEGY.md">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "QUICK_START_GUIDE.md">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block directory listing
+Options -Indexes
+
+# Prevent access to environment files
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Block suspicious user agents
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block common scrapers and bots
+    RewriteCond %{HTTP_USER_AGENT} (bot|crawler|scraper|spider|curl|wget|python|java|go-http|postman|insomnia) [NC]
+    RewriteRule .* - [F,L]
+    
+    # Block access to sensitive paths
+    RewriteRule ^(docs/|\.private/|documentation/) - [F,L]
+    RewriteRule .*\.(md|txt|secret|private|internal)$ - [F,L]
+    
+    # Block specific file names
+    RewriteRule ^(AI_CHAT_IMPLEMENTATION|CACHING_STRATEGY|QUICK_START_GUIDE) - [F,L]
+</IfModule>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Modal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        
+        .test-button {
+            background: #ec4899;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .test-button:hover {
+            background: #db2777;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 999999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: #1a472a;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 3px solid #d4af37;
+            position: relative;
+        }
+        
+        .modal-header {
+            padding: 24px;
+            border-bottom: 2px solid #d4af37;
+            text-align: center;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        .gaffer-icon {
+            width: 80px;
+            height: 80px;
+            background: #d4af37;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid white;
+        }
+        
+        .modal-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .modal-subtitle {
+            color: #90EE90;
+            font-size: 16px;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 8px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            box-sizing: border-box;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 4px;
+            transform: scale(1.5);
+        }
+        
+        .checkbox-label {
+            color: #90EE90;
+            font-size: 14px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            background: #d4af37;
+            color: #000000;
+            font-weight: bold;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: 3px solid #d4af37;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #ffffff;
+            color: #1a472a;
+        }
+    </style>
+</head>
+<body>
+    <h1>Direct Modal Test</h1>
+    <p>This is a standalone test to see if modals work outside of React.</p>
+    
+    <button class="test-button" onclick="showModal()">Show Registration Modal</button>
+    <button class="test-button" onclick="testAlert()">Test Alert</button>
+    <button class="test-button" onclick="testConfirm()">Test Confirm</button>
+    
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-btn" onclick="hideModal()">×</button>
+                <div class="gaffer-icon">
+                    <span style="font-size: 40px;">⚽</span>
+                </div>
+                <h2 class="modal-title">Join The Gaffer</h2>
+                <p class="modal-subtitle">Create your account to start beating the computer!</p>
+            </div>
+            
+            <form class="modal-body" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Username *</label>
+                    <input type="text" class="form-input" placeholder="Choose your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Club Team *</label>
+                    <select class="form-select" required>
+                        <option value="">Select your team</option>
+                        <option value="Arsenal">Arsenal</option>
+                        <option value="Aston Villa">Aston Villa</option>
+                        <option value="Bournemouth">Bournemouth</option>
+                        <option value="Brentford">Brentford</option>
+                        <option value="Brighton">Brighton</option>
+                        <option value="Burnley">Burnley</option>
+                        <option value="Chelsea">Chelsea</option>
+                        <option value="Crystal Palace">Crystal Palace</option>
+                        <option value="Everton">Everton</option>
+                        <option value="Fulham">Fulham</option>
+                        <option value="Ipswich">Ipswich</option>
+                        <option value="Leicester">Leicester</option>
+                        <option value="Liverpool">Liverpool</option>
+                        <option value="Luton Town">Luton Town</option>
+                        <option value="Man City">Man City</option>
+                        <option value="Man Utd">Man Utd</option>
+                        <option value="Newcastle">Newcastle</option>
+                        <option value="Nott'm Forest">Nott'm Forest</option>
+                        <option value="Sheffield Utd">Sheffield Utd</option>
+                        <option value="Southampton">Southampton</option>
+                        <option value="Spurs">Spurs</option>
+                        <option value="West Ham">West Ham</option>
+                        <option value="Wolves">Wolves</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nation *</label>
+                    <select class="form-select" required>
+                        <option value="">Select your nation</option>
+                        <option value="Qatar">Qatar (Host)</option>
+                        <option value="Ecuador">Ecuador</option>
+                        <option value="Senegal">Senegal</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="England">England</option>
+                        <option value="Iran">Iran</option>
+                        <option value="USA">USA</option>
+                        <option value="Wales">Wales</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Saudi Arabia">Saudi Arabia</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Poland">Poland</option>
+                        <option value="France">France</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Denmark">Denmark</option>
+                        <option value="Tunisia">Tunisia</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Costa Rica">Costa Rica</option>
+                        <option value="Germany">Germany</option>
+                        <option value="Japan">Japan</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Morocco">Morocco</option>
+                        <option value="Croatia">Croatia</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Serbia">Serbia</option>
+                        <option value="Switzerland">Switzerland</option>
+                        <option value="Cameroon">Cameroon</option>
+                        <option value="Portugal">Portugal</option>
+                        <option value="Ghana">Ghana</option>
+                        <option value="Uruguay">Uruguay</option>
+                        <option value="South Korea">South Korea</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" class="form-input" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="newsletter" checked>
+                    <label for="newsletter" class="checkbox-label">
+                        <strong>Get the Gaffer's newsletter?</strong><br>
+                        Weekly predictions, exclusive tips, and proper football banter.
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function showModal() {
+            console.log('Showing modal');
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+        
+        function hideModal() {
+            console.log('Hiding modal');
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+        
+        function testAlert() {
+            alert('Test alert working!');
+        }
+        
+        function testConfirm() {
+            const result = confirm('Test confirm working!');
+            console.log('Confirm result:', result);
+        }
+        
+        function handleSubmit(event) {
+            event.preventDefault();
+            alert('Form submitted successfully!');
+            hideModal();
+        }
+        
+        // Close modal when clicking overlay
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+</html>

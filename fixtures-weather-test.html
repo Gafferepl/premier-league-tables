@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixtures with Weather Integration Test</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // STADIUM COORDINATES
+        const STADIUMS = {
+            "Arsenal": { lat: 51.5549, lng: -0.1084 },
+            "Man City": { lat: 53.4831, lng: -2.2004 },
+            "Liverpool": { lat: 53.4308, lng: -2.9608 },
+            "Chelsea": { lat: 51.4816, lng: -0.1909 },
+        };
+
+        // Mock fixtures data
+        const MOCK_FIXTURES = [
+            { 
+                homeTeam: "Man City", 
+                awayTeam: "Liverpool", 
+                date: "Today", 
+                time: "20:00", 
+                status: "upcoming", 
+                score: "0 - 0",
+                difficulty: { att: 2, def: 3, overall: 3 }
+            },
+            { 
+                homeTeam: "Arsenal", 
+                awayTeam: "Chelsea", 
+                date: "Tomorrow", 
+                time: "15:00", 
+                status: "upcoming", 
+                score: "0 - 0",
+                difficulty: { att: 1, def: 2, overall: 2 }
+            },
+            { 
+                homeTeam: "Liverpool", 
+                awayTeam: "Man City", 
+                date: "Yesterday", 
+                time: "20:00", 
+                status: "finished", 
+                score: "2 - 1",
+                difficulty: { att: 3, def: 2, overall: 3 }
+            }
+        ];
+
+        const SmartFixtures = ({ data }) => {
+            const [weatherData, setWeatherData] = useState({});
+            const [weatherLoading, setWeatherLoading] = useState({});
+
+            const getFDRColor = (rating) => {
+                switch(rating) {
+                    case 1: return 'bg-emerald-500 text-white';
+                    case 2: return 'bg-emerald-300 text-emerald-900';
+                    case 3: return 'bg-slate-300 text-slate-800';
+                    case 4: return 'bg-orange-400 text-white';
+                    case 5: return 'bg-red-600 text-white';
+                    default: return 'bg-slate-200 text-slate-500';
+                }
+            };
+
+            const getWeatherIcon = (weather) => {
+                if (weather.precipitation > 0.5) return 'fa-cloud-rain';
+                if (weather.cloud_cover > 70) return 'fa-cloud';
+                if (weather.cloud_cover > 30) return 'fa-cloud-sun';
+                return 'fa-sun';
+            };
+
+            const getWeatherVerdict = (weather) => {
+                if (weather.precipitation > 0.5) return { text: 'Slick', color: 'text-blue-500' };
+                if (weather.wind_speed_10m > 15) return { text: 'Windy', color: 'text-gray-500' };
+                if (weather.temperature_2m > 20) return { text: 'Hot', color: 'text-orange-500' };
+                if (weather.temperature_2m < 5) return { text: 'Cold', color: 'text-cyan-500' };
+                return { text: 'Perfect', color: 'text-green-500' };
+            };
+
+            const fetchWeatherForStadium = async (homeTeam) => {
+                if (weatherData[homeTeam] || weatherLoading[homeTeam]) return;
+                
+                setWeatherLoading(prev => ({ ...prev, [homeTeam]: true }));
+                
+                const stadiumKey = Object.keys(STADIUMS).find(k => homeTeam.includes(k) || k.includes(homeTeam));
+                
+                if (stadiumKey) {
+                    const { lat, lng } = STADIUMS[stadiumKey];
+                    try {
+                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,precipitation,wind_speed_10m,cloud_cover&wind_speed_unit=mph`);
+                        const data = await res.json();
+                        if (data.current) {
+                            setWeatherData(prev => ({ ...prev, [homeTeam]: data.current }));
+                        }
+                    } catch (e) {
+                        console.error(`Weather error for ${homeTeam}`, e);
+                        setWeatherData(prev => ({ ...prev, [homeTeam]: { temperature_2m: 12, wind_speed_10m: 10, precipitation: 0, cloud_cover: 50 } }));
+                    }
+                }
+                
+                setWeatherLoading(prev => ({ ...prev, [homeTeam]: false }));
+            };
+
+            useEffect(() => {
+                const upcomingMatches = data?.filter(f => f.status !== 'finished') || [];
+                upcomingMatches.slice(0, 5).forEach(match => {
+                    fetchWeatherForStadium(match.homeTeam);
+                });
+            }, [data]);
+
+            return (
+                <div className="max-w-4xl mx-auto p-6">
+                    <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+                        {/* Header */}
+                        <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-3">
+                            <h2 className="text-xl font-bold text-slate-800">Premier League Fixtures with Weather</h2>
+                            <div>
+                                <p className="text-xs text-slate-600">
+                                    <strong className="text-slate-800">🌤️ Pitch Conditions:</strong> 
+                                    Click weather icons for detailed conditions. <span className="font-bold text-green-500">Perfect</span> = Ideal, <span className="font-bold text-blue-500">Slick</span> = Rainy, <span className="font-bold text-gray-500">Windy</span> = Strong winds.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Fixtures List */}
+                        <div className="divide-y divide-slate-200">
+                            {data.map((match, idx) => (
+                                <div key={idx} className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4">
+                                    
+                                    {/* Date & Difficulty */}
+                                    <div className="w-28 text-center">
+                                        <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                            {match.date}
+                                        </div>
+                                        <div className="flex flex-col gap-1 mt-2">
+                                            <div className="flex items-center gap-1 justify-between bg-slate-100 rounded px-1.5 py-0.5">
+                                                <span className="text-[8px] font-bold text-slate-500">ATT</span>
+                                                <span className={`text-[8px] font-black w-4 text-center rounded ${getFDRColor(match.difficulty?.att)}`}>{match.difficulty?.att}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1 justify-between bg-slate-100 rounded px-1.5 py-0.5">
+                                                <span className="text-[8px] font-bold text-slate-500">DEF</span>
+                                                <span className={`text-[8px] font-black w-4 text-center rounded ${getFDRColor(match.difficulty?.def)}`}>{match.difficulty?.def}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Teams */}
+                                    <div className="flex-grow flex items-center justify-center gap-4">
+                                        <div className="flex-1 text-right">
+                                            <span className="font-bold text-slate-800">{match.homeTeam}</span>
+                                        </div>
+                                        <div className="shrink-0 px-3 py-1 rounded-lg bg-slate-100 min-w-[80px] text-center border border-slate-200">
+                                            {match.status === 'finished' ? (
+                                                <span className="font-mono font-bold text-lg text-slate-800">{match.score}</span>
+                                            ) : (
+                                                <span className="font-mono font-bold text-lg text-slate-500">VS</span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 text-left">
+                                            <span className="font-bold text-slate-800">{match.awayTeam}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Time */}
+                                    <div className="w-24 text-center">
+                                        {match.status === 'finished' ? (
+                                            <span className="inline-block px-2 py-1 bg-slate-200 text-slate-600 text-xs font-bold rounded">FT</span>
+                                        ) : (
+                                            <span className="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded border border-slate-300">
+                                                {match.time}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Weather Widget */}
+                                    {match.status !== 'finished' && (
+                                        <div className="w-20 text-center">
+                                            {weatherLoading[match.homeTeam] ? (
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <div className="w-6 h-6 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></div>
+                                                    <span className="text-xs text-slate-400">Loading</span>
+                                                </div>
+                                            ) : weatherData[match.homeTeam] ? (
+                                                <div className="flex flex-col items-center gap-1 group cursor-pointer" onClick={() => fetchWeatherForStadium(match.homeTeam)}>
+                                                    <div className="relative">
+                                                        <i className={`fas ${getWeatherIcon(weatherData[match.homeTeam])} text-lg ${getWeatherVerdict(weatherData[match.homeTeam]).color}`}></i>
+                                                        <span className="absolute -top-1 -right-1 text-xs font-bold text-slate-600">
+                                                            {Math.round(weatherData[match.homeTeam].temperature_2m)}°
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-xs">
+                                                        <span className={`font-bold ${getWeatherVerdict(weatherData[match.homeTeam]).color}`}>
+                                                            {getWeatherVerdict(weatherData[match.homeTeam]).text}
+                                                        </span>
+                                                    </div>
+                                                    <div className="hidden group-hover:flex flex-col gap-1 absolute z-20 bg-white border border-slate-200 rounded-lg p-2 shadow-lg mt-8 min-w-[100px]">
+                                                        <div className="text-xs font-bold text-slate-600">
+                                                            <div className="flex justify-between gap-2">
+                                                                <span>Wind:</span>
+                                                                <span>{weatherData[match.homeTeam].wind_speed_10m} mph</span>
+                                                            </div>
+                                                            <div className="flex justify-between gap-2">
+                                                                <span>Rain:</span>
+                                                                <span>{weatherData[match.homeTeam].precipitation} mm</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <button 
+                                                        onClick={() => fetchWeatherForStadium(match.homeTeam)}
+                                                        className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors"
+                                                        title="Get weather"
+                                                    >
+                                                        <i className="fas fa-cloud text-xs text-slate-400"></i>
+                                                    </button>
+                                                    <span className="text-xs text-slate-400">Weather</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return <SmartFixtures data={MOCK_FIXTURES} />;
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+# The Gaffer's Hub - Robots.txt
+# IRON-CLAD PROTECTION - Block all documentation access
+
+User-agent: *
+Allow: /
+
+# DISALLOW ALL SENSITIVE PATHS (IRON-CLAD PROTECTION)
+Disallow: /api/
+Disallow: /admin/
+Disallow: /server/
+Disallow: /docs/
+Disallow: /.private/
+Disallow: /documentation/
+Disallow: /*.md
+Disallow: /*.txt
+Disallow: /*.secret
+Disallow: /*.private
+Disallow: /*.internal
+Disallow: /AI_CHAT_IMPLEMENTATION
+Disallow: /CACHING_STRATEGY
+Disallow: /QUICK_START_GUIDE
+Disallow: /env
+Disallow: /.env
+
+# Sitemap location
+Sitemap: https://premierleaguetables.com/sitemap.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

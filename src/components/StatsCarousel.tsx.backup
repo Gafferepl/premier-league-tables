@@ -1,0 +1,255 @@
+import React, { useState, useRef } from 'react';
+import { getTeamLogo, GAFFER_VERDICTS } from '../constants';
+import { MatchStats } from '../types';
+import ShareSnapshot from './ShareSnapshot';
+import LogoWithFallback from './LogoWithFallback';
+
+interface StatsCarouselProps {
+  data: MatchStats[];
+}
+
+const StatsCarousel: React.FC<StatsCarouselProps> = ({ data }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  if (!data || data.length === 0) {
+    return (
+       // Skeleton
+       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 relative h-[500px] animate-pulse">
+         <div className="bg-slate-100 dark:bg-slate-900 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between">
+           <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+           <div className="w-32 h-6 bg-slate-200 dark:bg-slate-700 rounded"></div>
+           <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+         </div>
+         <div className="p-8 bg-slate-200 dark:bg-slate-800 h-48 flex justify-center items-center">
+            <div className="w-16 h-16 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
+         </div>
+         <div className="p-6 space-y-4">
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+         </div>
+       </div>
+    );
+  }
+
+  const nextMatch = () => {
+    setActiveIndex((prev) => (prev === data.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevMatch = () => {
+    setActiveIndex((prev) => (prev === 0 ? data.length - 1 : prev - 1));
+  };
+
+  const match = data[activeIndex];
+  const homeLogo = getTeamLogo(match.homeTeam);
+  const awayLogo = getTeamLogo(match.awayTeam);
+
+  const calcPercentage = (val: number, total: number) => {
+    if (total === 0) return 50;
+    return Math.round((val / total) * 100);
+  };
+
+  const possessionHome = match.possession?.home || 50;
+  const possessionAway = match.possession?.away || 50;
+  
+  const shotsTotal = (match.shots?.home || 0) + (match.shots?.away || 0);
+  const shotsHomePct = calcPercentage(match.shots?.home || 0, shotsTotal);
+  const shotsAwayPct = calcPercentage(match.shots?.away || 0, shotsTotal);
+
+  const getGafferSummary = (m: MatchStats) => {
+    const scoreParts = m.score.split('-').map(s => parseInt(s.trim()));
+    const homeGoals = isNaN(scoreParts[0]) ? 0 : scoreParts[0];
+    const awayGoals = isNaN(scoreParts[1]) ? 0 : scoreParts[1];
+    const totalGoals = homeGoals + awayGoals;
+    
+    const hPoss = m.possession?.home || 50;
+    const aPoss = m.possession?.away || 50;
+    
+    const totalShots = (m.shots?.home || 0) + (m.shots?.away || 0);
+
+    const hashStr = `${m.homeTeam}${m.awayTeam}${m.score}`;
+    let hash = 0;
+    for (let i = 0; i < hashStr.length; i++) {
+        hash = hashStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const safeHash = Math.abs(hash);
+
+    let category: string[] = GAFFER_VERDICTS.GENERIC;
+
+    if (totalGoals === 0) {
+        category = GAFFER_VERDICTS.BORE_DRAW;
+    }
+    else if (totalGoals >= 5) {
+        category = GAFFER_VERDICTS.GOAL_FEST;
+    }
+    else if ((hPoss < 35 && homeGoals > awayGoals) || (aPoss < 35 && awayGoals > homeGoals)) {
+        category = GAFFER_VERDICTS.SMASH_GRAB;
+    }
+    else if ((hPoss > 65 && homeGoals <= awayGoals) || (aPoss > 65 && awayGoals <= homeGoals)) {
+        category = GAFFER_VERDICTS.TIPPY_TAPPY;
+    }
+    else if (totalShots > 25 && totalGoals <= 1) {
+        category = GAFFER_VERDICTS.WASTEFUL;
+    }
+    
+    return category[safeHash % category.length];
+  };
+
+  return (
+    <div ref={containerRef} className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 relative">
+      <ShareSnapshot targetRef={containerRef} className="absolute top-3 right-16 z-30" />
+
+      {/* Header / Navigation */}
+      <div className="bg-slate-50 dark:bg-slate-900 p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <button 
+          onClick={prevMatch}
+          className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow flex items-center justify-center text-slate-500 hover:text-accent hover:bg-slate-100 transition-colors"
+          data-html2canvas-ignore
+        >
+          <i className="fas fa-chevron-left"></i>
+        </button>
+        
+        <div className="text-center">
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest">{match.date}</h3>
+          <p className="text-xs text-slate-400">Match {activeIndex + 1} of {data.length}</p>
+        </div>
+
+        <button 
+          onClick={nextMatch}
+          className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow flex items-center justify-center text-slate-500 hover:text-accent hover:bg-slate-100 transition-colors"
+          data-html2canvas-ignore
+        >
+          <i className="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      {/* Scoreboard */}
+      <div className="p-8 bg-hero-gradient text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        
+        <div className="relative z-10 flex justify-between items-center max-w-3xl mx-auto">
+          {/* Home Team */}
+          <div className="text-center w-1/3 flex flex-col items-center group">
+             <div className="w-20 h-20 mx-auto flex items-center justify-center filter drop-shadow-xl transform group-hover:scale-110 transition-transform duration-300 mb-3">
+               <LogoWithFallback src={homeLogo} teamName={match.homeTeam} size="w-16 h-16 md:w-full md:h-full" className="text-2xl" />
+             </div>
+             <h2 className="font-heading font-bold text-lg md:text-xl leading-tight">{match.homeTeam}</h2>
+          </div>
+
+          {/* Score */}
+          <div className="text-center w-1/3">
+             <div className="text-4xl md:text-6xl font-black font-mono tracking-widest bg-black/20 px-4 py-2 rounded-lg backdrop-blur-sm inline-block shadow-inner">
+               {match.score}
+             </div>
+             <div className="text-xs text-blue-200 mt-3 uppercase tracking-wider font-bold border-t border-white/20 pt-1 inline-block">Full Time</div>
+          </div>
+
+          {/* Away Team */}
+          <div className="text-center w-1/3 flex flex-col items-center group">
+             <div className="w-20 h-20 mx-auto flex items-center justify-center filter drop-shadow-xl transform group-hover:scale-110 transition-transform duration-300 mb-3">
+               <LogoWithFallback src={awayLogo} teamName={match.awayTeam} size="w-16 h-16 md:w-full md:h-full" className="text-2xl" />
+             </div>
+             <h2 className="font-heading font-bold text-lg md:text-xl leading-tight">{match.awayTeam}</h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Scorers */}
+      <div className="bg-slate-100 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 p-4 flex justify-between text-sm">
+         <div className="text-left w-[45%]">
+            {match.homeScorers && match.homeScorers.length > 0 ? (
+               match.homeScorers.map((s, i) => (
+                 <div key={i} className="text-slate-700 dark:text-slate-300 font-medium flex items-center">
+                   <i className="fas fa-futbol text-xs text-slate-400 mr-2"></i>{s}
+                 </div>
+               ))
+            ) : <span className="text-slate-400 italic text-xs">No scorers</span>}
+         </div>
+         <div className="text-right w-[45%]">
+            {match.awayScorers && match.awayScorers.length > 0 ? (
+               match.awayScorers.map((s, i) => (
+                 <div key={i} className="text-slate-700 dark:text-slate-300 font-medium flex items-center justify-end">
+                   {s}<i className="fas fa-futbol text-xs text-slate-400 ml-2"></i>
+                 </div>
+               ))
+            ) : <span className="text-slate-400 italic text-xs">No scorers</span>}
+         </div>
+      </div>
+
+      {/* Detailed Stats */}
+      <div className="p-6 space-y-6">
+         
+         {/* Possession */}
+         <div>
+            <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+               <span>Possession</span>
+               <span>{possessionHome}% - {possessionAway}%</span>
+            </div>
+            <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex shadow-inner">
+               <div 
+                 className="bg-primary h-full" 
+                 style={{ width: `${possessionHome}%` }}
+               ></div>
+               <div 
+                 className="bg-accent h-full" 
+                 style={{ width: `${possessionAway}%` }}
+               ></div>
+            </div>
+         </div>
+
+         {/* Shots */}
+         <div>
+            <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+               <span>Total Shots</span>
+               <span>{match.shots?.home} - {match.shots?.away}</span>
+            </div>
+            <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex shadow-inner">
+               <div 
+                 className="bg-blue-400 h-full" 
+                 style={{ width: `${shotsHomePct}%` }}
+               ></div>
+               <div 
+                 className="bg-pink-400 h-full" 
+                 style={{ width: `${shotsAwayPct}%` }}
+               ></div>
+            </div>
+         </div>
+
+         {/* --- ZERO COST GAFFER SUMMARY --- */}
+         <div className="py-2 px-4 bg-yellow-50 dark:bg-yellow-900/10 border-l-4 border-yellow-400 rounded-r-lg my-4">
+             <div className="flex items-start gap-3">
+                 <div className="text-2xl mt-1 opacity-20"><i className="fas fa-quote-left text-slate-800 dark:text-white"></i></div>
+                 <div>
+                    <p className="font-heading font-black text-[10px] text-yellow-600 dark:text-yellow-500 uppercase tracking-widest mb-1">The Verdict</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 italic leading-snug">
+                        "{getGafferSummary(match)}"
+                    </p>
+                 </div>
+             </div>
+         </div>
+
+         <div className="grid grid-cols-3 text-center pt-4 border-t border-slate-100 dark:border-slate-700/50">
+            <div>
+               <div className="text-2xl font-bold text-primary dark:text-white">{match.shotsOnTarget?.home || 0}</div>
+               <div className="text-xs uppercase font-bold text-slate-400">On Target</div>
+            </div>
+            <div className="flex items-center justify-center">
+               <div className="w-px h-8 bg-slate-200 dark:bg-slate-700"></div>
+            </div>
+            <div>
+               <div className="text-2xl font-bold text-accent">{match.shotsOnTarget?.away || 0}</div>
+               <div className="text-xs uppercase font-bold text-slate-400">On Target</div>
+            </div>
+         </div>
+      </div>
+      
+      <div className="p-2 bg-slate-50 dark:bg-slate-900 text-center text-xs text-slate-400 uppercase tracking-wider font-bold">
+         "Statistics are like mini-skirts. They show a lot, but hide the vital parts." - The Gaffer
+      </div>
+
+    </div>
+  );
+};
+
+export default StatsCarousel;

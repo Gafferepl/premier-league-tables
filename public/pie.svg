@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pie Tin -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5 5" />
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#b91c1c" stroke-width="4" />
+  <!-- Text Seal -->
+  <path id="curve" d="M 40 100 A 60 60 0 1 1 160 100" fill="transparent" />
+  <text width="200" font-family="Courier New, monospace" font-weight="bold" font-size="24" fill="#b91c1c" text-anchor="middle">
+    <textPath href="#curve" startOffset="50%" text-anchor="middle">OFFICIAL PIE</textPath>
+  </text>
+  <text x="100" y="130" font-family="Courier New, monospace" font-weight="bold" font-size="30" fill="#b91c1c" text-anchor="middle">PACT</text>
+</svg>

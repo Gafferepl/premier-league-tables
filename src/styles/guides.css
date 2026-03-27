@@ -1,0 +1,222 @@
+/* Comprehensive Guides Responsive Styles */
+
+/* Mobile First Approach */
+@media (max-width: 640px) {
+  .guides-container {
+    flex-direction: column;
+  }
+  
+  .guides-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid;
+  }
+  
+  .guides-content {
+    width: 100%;
+  }
+  
+  .guides-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .guide-card {
+    padding: 1rem;
+  }
+  
+  .guide-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .guide-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .guide-action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .guides-sidebar {
+    width: 280px;
+  }
+  
+  .guides-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .guide-card {
+    padding: 1.25rem;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1025px) {
+  .guides-sidebar {
+    width: 320px;
+  }
+  
+  .guides-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .guide-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+  .guides-sidebar {
+    width: 360px;
+  }
+  
+  .guides-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Animation Classes */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.guides-animate-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.guides-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.guides-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .guide-card {
+    min-height: 44px;
+    padding: 1rem;
+  }
+  
+  .guide-action-button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .guide-quiz-option {
+    min-height: 44px;
+    padding: 0.75rem;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .guides-animate-in,
+  .guides-fade-in,
+  .guides-scale-in {
+    animation: none;
+  }
+  
+  .guide-card {
+    transition: none;
+  }
+  
+  .guide-action-button {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .guide-card {
+    border-width: 2px;
+  }
+  
+  .guide-action-button {
+    border-width: 2px;
+  }
+  
+  .guide-quiz-option {
+    border-width: 2px;
+  }
+}
+
+/* Dark mode specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .guides-container {
+    background-color: #1e293b;
+    color: #f1f5f9;
+  }
+  
+  .guide-card {
+    background-color: #334155;
+    border-color: #475569;
+  }
+  
+  .guide-action-button {
+    background-color: #7c3aed;
+    color: white;
+  }
+}
+
+/* Focus management for accessibility */
+.guide-action-button:focus,
+.guide-quiz-option:focus,
+.guide-category-button:focus {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .guides-sidebar,
+  .guide-actions,
+  .guide-quiz {
+    display: none;
+  }
+  
+  .guides-content {
+    width: 100%;
+  }
+  
+  .guide-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

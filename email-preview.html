@@ -1,0 +1,3459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>premierleaguetables.com - Email Template Gallery</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .preview-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            color: #1f2937;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 16px;
+        }
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 30px;
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+        .category {
+            margin-bottom: 25px;
+        }
+        .category-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-left: 8px;
+        }
+        .email-btn {
+            width: 100%;
+            padding: 12px 16px;
+            background: white;
+            color: #1f2937;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .email-btn:hover {
+            background: #f9fafb;
+            border-color: #667eea;
+            transform: translateX(4px);
+        }
+        .email-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .email-btn-icon {
+            font-size: 18px;
+            min-width: 24px;
+        }
+        .email-btn-text {
+            flex: 1;
+        }
+        .email-btn-badge {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .email-btn.active .email-btn-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .email-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            min-height: 700px;
+        }
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .email-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .email-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        .email-frame {
+            width: 100%;
+            height: 650px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+        }
+        .instructions {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px 24px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+        }
+        .instructions h3 {
+            margin: 0 0 8px 0;
+            color: #92400e;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .instructions p {
+            margin: 0;
+            color: #92400e;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        /* Email Editor Styles */
+        .action-btn.editing {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .email-frame.editing {
+            border: 3px solid #667eea !important;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="header">
+            <h1>📧 Email Template Editor</h1>
+            <p>Edit, customize, and manage all premierleaguetables.com email templates with live preview and save functionality</p>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number">18</div>
+                    <div class="stat-label">Total Templates</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Subscription Tiers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1-2</div>
+                    <div class="stat-label">Emails Per Week</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">60%</div>
+                    <div class="stat-label">Email Reduction</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>💡 Email Editor Guide</h3>
+            <p><strong>✏️ Edit Mode:</strong> Click "Edit Mode" to enable inline editing. Hover over any text to highlight, then click to edit. <strong>💾 Save:</strong> Changes are saved automatically to localStorage. <strong>📤 Export/Import:</strong> Backup your customizations or share with team. <strong>🔄 Reset:</strong> Revert to original template anytime.</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="sidebar">
+                <div class="category">
+                    <div class="category-title">🆓 Free Tier (1 email/week)</div>
+                    <button class="email-btn active" onclick="showEmail('captain-picks-free')">
+                        <span class="email-btn-icon">👑</span>
+                        <span class="email-btn-text">Weekly Captain Picks</span>
+                        <span class="email-btn-badge">Sat 9AM</span>
+                    </button>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">👑 First Team (2 emails/week)</div>
+                    <button class="email-btn" onclick="showEmail('captain-picks-paid')">
+                        <span class="email-btn-icon">⭐</span>
+                        <span class="email-btn-text">Elite Captain Picks</span>
+                        <span class="email-btn-badge">Thu 6PM</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('price-intelligence')">
+                        <span class="email-btn-icon">📈</span>
+                        <span class="email-btn-text">Price Intelligence</span>
+                        <span class="email-btn-badge">Fri 6PM</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('weekly-digest')">
+                        <span class="email-btn-icon">📊</span>
+                        <span class="email-btn-text">Weekly Digest</span>
+                        <span class="email-btn-badge">Sat 9AM</span>
+                    </button>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">💎 Season Pass (2 emails/week)</div>
+                    <button class="email-btn" onclick="showEmail('captain-picks-paid')">
+                        <span class="email-btn-icon">⭐</span>
+                        <span class="email-btn-text">Elite Captain Picks</span>
+                        <span class="email-btn-badge">Thu 6PM</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('price-intelligence')">
+                        <span class="email-btn-icon">📈</span>
+                        <span class="email-btn-text">Advanced Price Intel</span>
+                        <span class="email-btn-badge">Fri 6PM</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('weekly-digest')">
+                        <span class="email-btn-icon">👑</span>
+                        <span class="email-btn-text">Elite Weekly Digest</span>
+                        <span class="email-btn-badge">Sat 9AM</span>
+                    </button>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">👋 Welcome Emails</div>
+                    <button class="email-btn" onclick="showEmail('free-welcome')">
+                        <span class="email-btn-icon">🆓</span>
+                        <span class="email-btn-text">Free Welcome</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('paid-welcome')">
+                        <span class="email-btn-icon">👑</span>
+                        <span class="email-btn-text">First Team Welcome</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('season-pass')">
+                        <span class="email-btn-icon">💎</span>
+                        <span class="email-btn-text">Season Pass Welcome</span>
+                    </button>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">💳 Payment Emails</div>
+                    <button class="email-btn" onclick="showEmail('thank-you')">
+                        <span class="email-btn-icon">✅</span>
+                        <span class="email-btn-text">Payment Success</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('thank-you-season')">
+                        <span class="email-btn-icon">💎</span>
+                        <span class="email-btn-text">Season Pass Success</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('payment-failed')">
+                        <span class="email-btn-icon">⚠️</span>
+                        <span class="email-btn-text">Payment Failed</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('payment-failed-season')">
+                        <span class="email-btn-icon">⚠️</span>
+                        <span class="email-btn-text">Season Pass Failed</span>
+                    </button>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">😔 Cancellation Emails</div>
+                    <button class="email-btn" onclick="showEmail('cancellation')">
+                        <span class="email-btn-icon">👋</span>
+                        <span class="email-btn-text">First Team Cancel</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('cancellation-season')">
+                        <span class="email-btn-icon">💔</span>
+                        <span class="email-btn-text">Season Pass Cancel</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('unsubscribe')">
+                        <span class="email-btn-icon">📧</span>
+                        <span class="email-btn-text">Unsubscribe Confirm</span>
+                    </button>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">🤖 Auto-Reply Emails</div>
+                    <button class="email-btn" onclick="showEmail('auto-reply-feedback')">
+                        <span class="email-btn-icon">💬</span>
+                        <span class="email-btn-text">Feedback Reply</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('auto-reply-support')">
+                        <span class="email-btn-icon">🛠️</span>
+                        <span class="email-btn-text">Support Reply</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('auto-reply-unsubscribe')">
+                        <span class="email-btn-icon">🚫</span>
+                        <span class="email-btn-text">Unsubscribe Reply</span>
+                    </button>
+                    <button class="email-btn" onclick="showEmail('auto-reply-other')">
+                        <span class="email-btn-icon">📧</span>
+                        <span class="email-btn-text">General Reply</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="email-content">
+                <div class="email-header">
+                    <div class="email-title" id="emailTitle">Captain Picks (Free Tier)</div>
+                    <div class="email-actions">
+                        <button class="action-btn" id="editBtn" onclick="toggleEditMode()">✏️ Edit Mode</button>
+                        <button class="action-btn" id="saveBtn" onclick="saveChanges()" style="display: none;">💾 Save Changes</button>
+                        <button class="action-btn" id="resetBtn" onclick="resetToOriginal()" style="display: none;">🔄 Reset</button>
+                        <button class="action-btn" onclick="refreshEmail()">🔄 Refresh</button>
+                        <button class="action-btn" onclick="openInNewTab()">🔗 Open in Tab</button>
+                        <button class="action-btn" onclick="exportTemplates()">📤 Export</button>
+                        <button class="action-btn" onclick="importTemplates()">📥 Import</button>
+                    </div>
+                </div>
+                <iframe id="emailFrame" class="email-frame" srcdoc=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const emailTemplates = {
+            'weekly-digest': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #1e293b, #334155); 
+            padding: 40px 30px; 
+            text-align: center;
+            border-bottom: 2px solid #3b82f6;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: #f1f5f9; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #94a3b8; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .premium-badge { 
+            background: linear-gradient(135deg, #f59e0b, #f97316); 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            display: inline-block; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .toc { 
+            background: #1e293b; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            border-left: 4px solid #3b82f6;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .toc-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 15px;
+            letter-spacing: -0.025em;
+        }
+        .toc-item { 
+            padding: 12px 0; 
+            border-bottom: 1px solid #334155; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .toc-item:hover {
+            padding-left: 8px;
+            color: #3b82f6;
+        }
+        .toc-item:last-child { border-bottom: none; }
+        .section-box { 
+            background: #1e293b; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid #3b82f6;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .section-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 15px;
+            letter-spacing: -0.025em;
+        }
+        .captain-card { 
+            background: #334155; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 12px;
+            border: 1px solid #475569;
+            transition: all 0.2s ease;
+        }
+        .captain-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        .captain-name { 
+            font-weight: 600; 
+            color: #f1f5f9; 
+            font-size: 16px;
+        }
+        .captain-stats { 
+            color: #94a3b8; 
+            font-size: 14px; 
+            margin-top: 5px;
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #3b82f6;
+        }
+        /* Dark mode specific styles */
+        .risk-high { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+        .risk-medium { background: rgba(245, 158, 11, 0.1); border-color: #f59e0b; }
+        .risk-low { background: rgba(16, 185, 129, 0.1); border-color: #10b981; }
+        .rising { color: #10b981; }
+        .falling { color: #ef4444; }
+        .accent-text { color: #3b82f6; }
+        .subtle-text { color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="premium-badge">📊 WEEKLY DIGEST</div>
+            <h1 class="title">The Gaffer's Weekly Dossier - GW16</h1>
+            <p class="subtitle">Right then, lads! Here's the proper lowdown for the week ahead</p>
+        </div>
+        <div class="content">
+            <div class="toc">
+                <div class="toc-title">📋 The Gaffer's Game Plan</div>
+                <div class="toc-item"><span>👑 The Gaffer's Captain Call</span><span>→</span></div>
+                <div class="toc-item"><span>🔄 Transfer Dossier</span><span>→</span></div>
+                <div class="toc-item"><span>🏥 The Physio Room</span><span>→</span></div>
+                <div class="toc-item"><span>📊 Market Movers</span><span>→</span></div>
+                <div class="toc-item"><span>📅 Fixture Forecaster</span><span>→</span></div>
+                <div class="toc-item"><span>💡 The Gaffer's Final Word</span><span>→</span></div>
+            </div>
+            <div class="section-box">
+                <h3 class="section-title">👑 The Gaffer's Captain Call - 48 Hours Before The Mugs</h3>
+                <div class="captain-card">
+                    <div class="captain-name">1. Erling Haaland (MCI) vs BHA</div>
+                    <div class="captain-stats">Form: 9.2 | xG: 1.8 | Ownership: 82%</div>
+                    <p style="color: #6b7280; margin-top: 8px; font-size: 14px;">Listen, son. Brighton's high line against Haaland? That's like giving a kid keys to a sweet shop. Sometimes obvious is brilliant, yeah?</p>
+                </div>
+                <div class="captain-card">
+                    <div class="captain-name">2. Mohamed Salah (LIV) vs NEW</div>
+                    <div class="captain-stats">Form: 8.8 | xG: 1.5 | Ownership: 76%</div>
+                    <p style="color: #6b7280; margin-top: 8px; font-size: 14px;">Newcastle's backline is about as solid as my nan's gravy. Salah at Anfield? It's not rocket science, is it?</p>
+                </div>
+            </div>
+            <div class="section-box">
+                <h3 class="section-title">🔄 The Gaffer's Transfer Dossier</h3>
+                <p style="color: #94a3b8; margin-bottom: 15px;">Right then, lads. Here's the proper transfer business for GW16. No nonsense, just facts:</p>
+                <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="font-weight: 600; color: #92400e;">🔴 OUT: Son Heung-min</div>
+                    <div style="color: #fbbf24; font-size: 14px; margin-top: 5px;">Tough fixtures coming up and Postecoglou loves a rotation, does he? Get out while you can.</div>
+                </div>
+                <div style="background: #d1fae5; padding: 15px; border-radius: 8px;">
+                    <div style="font-weight: 600; color: #065f46;">🟢 IN: Phil Foden</div>
+                    <div style="color: #34d399; font-size: 14px; margin-top: 5px;">Easy fixtures and Pep's finally playing him through the middle. About time, too!</div>
+                </div>
+            </div>
+            <div class="section-box">
+                <h3 class="section-title">🏥 The Physio Room - The Gaffer's Injury Intel</h3>
+                <p style="color: #94a3b8; margin-bottom: 15px;">Right then, lads. Here's what the medical team are saying (and what they're not saying):</p>
+                <div style="background: #fef2f2; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #ef4444;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <div style="font-weight: 600; color: #991b1b;">🔴 Gabriel Jesus (ARS)</div>
+                        <div style="background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">HIGH RISK</div>
+                    </div>
+                    <div style="color: #f87171; font-size: 14px; margin-top: 5px;">Knee's gone again. Arteta's being coy as usual, but I'm hearing doubtful. Get him out if you need the funds, son.</div>
+                </div>
+                <div style="background: #fffbeb; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #f59e0b;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <div style="font-weight: 600; color: #92400e;">🟡 Bukayo Saka (ARS)</div>
+                        <div style="background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">MEDIUM RISK</div>
+                    </div>
+                    <div style="color: #fbbf24; font-size: 14px; margin-top: 5px;">Little knock. He'll probably play, but keep an eye on Friday's team news. You know what these London clubs are like...</div>
+                </div>
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 3px solid #10b981;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <div style="font-weight: 600; color: #065f46;">🟢 Kevin De Bruyne (MCI)</div>
+                        <div style="background: #d1fae5; color: #065f46; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">LOW RISK</div>
+                    </div>
+                    <div style="color: #34d399; font-size: 14px; margin-top: 5px;">Fully fit and raring to go. That rest did him the world of good, didn't it? Back to his best, that one.</div>
+                </div>
+            </div>
+            <div class="section-box">
+                <h3 class="section-title">📊 Market Movers - The Gaffer's Transfer Tracker</h3>
+                <p style="color: #94a3b8; margin-bottom: 15px;">Swings and roundabouts, this FPL business. Here's what the masses are up to:</p>
+                <div class="captain-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="captain-name">📈 The Bandwagon Brigade</div>
+                            <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Phil Foden - 125k transfers in (45% → 48% ownership)</div>
+                            <div style="color: #94a3b8; font-size: 13px;">Ollie Watkins - 98k transfers in (38% → 41% ownership)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="captain-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="captain-name">📉 The Panic Sellers</div>
+                            <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Son Heung-min - 87k transfers out (52% → 49% ownership)</div>
+                            <div style="color: #94a3b8; font-size: 13px;">Marcus Rashford - 76k transfers out (41% → 38% ownership)</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 3px solid #3b82f6;">
+                    <div style="font-weight: 600; color: #1e40af; margin-bottom: 5px;">💡 Template Watch</div>
+                    <div style="color: #3b82f6; font-size: 14px;">Everyone's piling into City assets, aren't they? 78% of the clever dicks now have both Haaland and Foden. Sometimes you've got to follow the smart money, son.</div>
+                </div>
+            </div>
+            <div class="section-box">
+                <h3 class="section-title">📅 The Gaffer's Fixture Forecaster</h3>
+                <p style="color: #94a3b8; margin-bottom: 15px;">Right then, lads. Let's have a proper look at the fixtures. Some are gifts, some are traps:</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <div style="background: #d1fae5; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-weight: 600; color: #065f46; font-size: 14px;">Easy Fixtures</div>
+                        <div style="color: #34d399; font-size: 12px; margin-top: 5px;">City, Liverpool, Arsenal</div>
+                    </div>
+                    <div style="background: #fee2e2; padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-weight: 600; color: #991b1b; font-size: 14px;">Hard Fixtures</div>
+                        <div style="color: #f87171; font-size: 12px; margin-top: 5px;">Spurs, United, Chelsea</div>
+                    </div>
+                </div>
+                <div class="captain-card">
+                    <div class="captain-name">⚽ The Gaffer's Pick: City vs Brighton</div>
+                    <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Brighton's high line against Haaland? That's not just a mismatch, that's criminal! City are averaging 3.2 at home. Load up, son.</div>
+                </div>
+                <div class="captain-card">
+                    <div class="captain-name">⚽ The Gaffer's Warning: Spurs vs Fulham</div>
+                    <div style="color: #94a3b8; font-size: 13px; margin-top: 5px;">Now listen carefully. This looks easy on paper, but Fulham away is tougher than it looks. Marco Silva's got them organized. Stay away from Spurs attackers, son.</div>
+                </div>
+            </div>
+            <div class="section-box">
+                <h3 class="section-title">💡 The Gaffer's Final Word</h3>
+                <p style="color: #94a3b8; font-style: italic; line-height: 1.6;">"Right then, lads. This week's simple as that, really. Back the big boys at home. Don't get clever with differentials when the template players are licking their lips at these fixtures. It's a marathon, not a sprint. Save your chips for the double gameweeks. The Gaffer's spoken."</p>
+                <p style="color: #f1f5f9; font-weight: 600; margin-top: 10px;">— The Gaffer</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Manage Subscription</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'price-intelligence': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #dc2626, #991b1b); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #fef3c7; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .countdown { 
+            background: linear-gradient(135deg, #dc2626, #991b1b); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
+        }
+        .countdown-time { 
+            font-size: 36px; 
+            font-weight: 700; 
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .price-section { 
+            background: #1e293b; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid #f59e0b;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .price-title { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 15px;
+            letter-spacing: -0.025em;
+        }
+        .price-item { 
+            background: #334155; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border: 1px solid #475569;
+            transition: all 0.2s ease;
+        }
+        .price-item:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+        }
+        .player-name { 
+            font-weight: 600; 
+            color: #f1f5f9;
+        }
+        .price-change { 
+            font-weight: 700; 
+            font-size: 16px;
+        }
+        .rising { 
+            color: #10b981;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+        .falling { 
+            color: #ef4444;
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">📈 The Gaffer's Price Watch - Get In Before The Lemmings</h1>
+            <p class="subtitle">Right then, lads! The market's about to go mental. The Gaffer's got your back</p>
+        </div>
+        <div class="content">
+            <div class="countdown">
+                <div style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">⏰ The Madness Begins In</div>
+                <div class="countdown-time">6 Hours</div>
+                <div style="font-size: 14px; opacity: 0.9;">Friday 11:30 PM - Don't Say The Gaffer Didn't Warn You!</div>
+            </div>
+            <div class="price-section">
+                <h3 class="price-title">📈 The Bandwagon Brigade - Get On Board!</h3>
+                <div class="price-item">
+                    <div>
+                        <div class="player-name">Erling Haaland (MCI)</div>
+                        <div style="color: #94a3b8; font-size: 12px;">£14.2m | 125k mugs piling in</div>
+                    </div>
+                    <div class="price-change rising">+£0.1m ↗</div>
+                </div>
+                <div class="price-item">
+                    <div>
+                        <div class="player-name">Phil Foden (MCI)</div>
+                        <div style="color: #94a3b8; font-size: 12px;">£9.1m | 98k clever dicks getting in early</div>
+                    </div>
+                    <div class="price-change rising">+£0.1m ↗</div>
+                </div>
+            </div>
+            <div class="price-section">
+                <h3 class="price-title">📉 The Panic Sellers - Get Out While You Can!</h3>
+                <div class="price-item">
+                    <div>
+                        <div class="player-name">Son Heung-min (TOT)</div>
+                        <div style="color: #94a3b8; font-size: 12px;">£9.8m | 87k lads bailing out</div>
+                    </div>
+                    <div class="price-change falling">-£0.1m ↘</div>
+                </div>
+                <div class="price-item">
+                    <div>
+                        <div class="player-name">Marcus Rashford (MUN)</div>
+                        <div style="color: #94a3b8; font-size: 12px;">£8.9m | 76k seeing the light and running</div>
+                    </div>
+                    <div class="price-change falling">-£0.1m ↘</div>
+                </div>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2);">
+                <h3 style="color: #fbbf24; margin-bottom: 10px;">💡 The Gaffer's Final Word</h3>
+                <p style="color: #fbbf24; font-style: italic; margin: 0;">"Listen, son. If you're doing transfers anyway, get them done before midnight. Every 0.1m matters when you're trying to beat that annoying mate in your mini-league. The Gaffer's seen it all before - don't be that lad who loses by 2 points because he waited too long!"</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Manage Subscription</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'captain-picks-free': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #1e40af, #3b82f6); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #e0e7ff; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .captain-card { 
+            background: #1e293b; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-left: 4px solid #3b82f6;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .captain-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        .captain-name { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+        .captain-stats { 
+            color: #94a3b8; 
+            font-size: 14px;
+        }
+        .upgrade-box { 
+            background: linear-gradient(135deg, #f59e0b, #f97316); 
+            color: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+        }
+        .upgrade-button { 
+            background: white; 
+            color: #f59e0b; 
+            padding: 16px 32px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .upgrade-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">👑 The Gaffer's Captain Call - GW16</h1>
+            <p class="subtitle">Right then, lads! Here's the proper business for this week</p>
+        </div>
+        <div class="content">
+            <div class="captain-card">
+                <div class="captain-name">1. Erling Haaland (MCI)</div>
+                <div class="captain-stats">vs Brighton (H) | Form: 9.2 | Ownership: 82%</div>
+                <p style="color: #94a3b8; margin-top: 10px; font-size: 14px;">Sometimes the obvious choice is the best choice, son. Brighton's high line against Haaland? That's just asking for trouble, isn't it?</p>
+            </div>
+            <div class="captain-card">
+                <div class="captain-name">2. Mohamed Salah (LIV)</div>
+                <div class="captain-stats">vs Newcastle (H) | Form: 8.8 | Ownership: 76%</div>
+                <p style="color: #94a3b8; margin-top: 10px; font-size: 14px;">Salah at Anfield against Newcastle's shaky defence? It's not exactly rocket science, is it? Back to basics, lads.</p>
+            </div>
+            <div class="captain-card">
+                <div class="captain-name">3. Bukayo Saka (ARS)</div>
+                <div class="captain-stats">vs Wolves (H) | Form: 7.5 | Ownership: 45%</div>
+                <p style="color: #94a3b8; margin-top: 10px; font-size: 14px;">Now this one's for the brave lads. Saka against Wolves at home. Sometimes you've got to be bold to win, haven't you?</p>
+            </div>
+            <div class="upgrade-box">
+                <h3 style="margin-bottom: 10px;">🚀 Want The Gaffer's 48-Hour Early Access?</h3>
+                <p style="margin-bottom: 20px;">Listen, son. The clever dicks get this on Thursday while you're waiting for Saturday. Don't be that lad who's always playing catch-up!</p>
+                <a href="#" class="upgrade-button">Join The First Team - £2.99/week</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'captain-picks-paid': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #7c3aed, #a855f7); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .premium-badge { 
+            background: linear-gradient(135deg, #f59e0b, #f97316); 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            display: inline-block; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #e9d5ff; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .early-access { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        }
+        .captain-card { 
+            background: #1e293b; 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 15px; 
+            border-left: 4px solid #7c3aed;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .captain-card:hover {
+            border-color: #7c3aed;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+        }
+        .captain-rank { 
+            background: linear-gradient(135deg, #7c3aed, #a855f7); 
+            color: white; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            margin-right: 10px;
+            box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+        }
+        .captain-name { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: #f1f5f9;
+            letter-spacing: -0.025em;
+        }
+        .advanced-stats { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        .stat-box { 
+            background: #334155; 
+            padding: 10px; 
+            border-radius: 6px; 
+            text-align: center;
+            border: 1px solid #475569;
+            transition: all 0.2s ease;
+        }
+        .stat-box:hover {
+            border-color: #7c3aed;
+            background: #475569;
+        }
+        .stat-label { 
+            font-size: 11px; 
+            color: #94a3b8; 
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .stat-value { 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: #f1f5f9;
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #7c3aed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="premium-badge">⭐ ELITE ACCESS</div>
+            <h1 class="title">👑 The Gaffer's Elite Captain Call - GW16</h1>
+            <p class="subtitle">48 hours before the mugs get their hands on this. Proper inside info, lads</p>
+        </div>
+        <div class="content">
+            <div class="early-access">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 5px;">⚡ THE GAFFER'S EDGE</div>
+                <div style="font-size: 24px; font-weight: bold;">48 Hours Before The Mugs</div>
+                <div style="font-size: 12px; opacity: 0.9; margin-top: 5px;">While everyone else is panicking Saturday morning, you're already sorted</div>
+            </div>
+            <div class="captain-card">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <span class="captain-rank">1</span>
+                    <span class="captain-name">Erling Haaland (MCI) vs BHA</span>
+                </div>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">Listen carefully, son. Brighton's high line against Haaland? That's not just suicide, that's criminal! Last 3 meetings averaged 2.3 for him, and now KDB's back pulling the strings. This could be ugly, and I mean that in the best way possible.</p>
+                <div class="advanced-stats">
+                    <div class="stat-box"><div class="stat-label">xG</div><div class="stat-value">1.8</div></div>
+                    <div class="stat-box"><div class="stat-label">Form</div><div class="stat-value">9.2</div></div>
+                    <div class="stat-box"><div class="stat-label">Own%</div><div class="stat-value">82%</div></div>
+                </div>
+            </div>
+            <div class="captain-card">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <span class="captain-rank">2</span>
+                    <span class="captain-name">Mohamed Salah (LIV) vs NEW</span>
+                </div>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.6;">Newcastle's backline is about as organized as my youth team's warm-up. Key defenders out, confidence shot. Salah at Anfield? That's like fishing in a barrel, isn't it? Liverpool are hitting form at the perfect time, son.</p>
+                <div class="advanced-stats">
+                    <div class="stat-box"><div class="stat-label">xG</div><div class="stat-value">1.5</div></div>
+                    <div class="stat-box"><div class="stat-label">Form</div><div class="stat-value">8.8</div></div>
+                    <div class="stat-box"><div class="stat-label">Own%</div><div class="stat-value">76%</div></div>
+                </div>
+            </div>
+            <div style="background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 12px; border-left: 4px solid #3b82f6; margin-top: 20px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                <h3 style="color: #60a5fa; margin-bottom: 10px;">💡 The Gaffer's Elite Insight</h3>
+                <p style="color: #60a5fa; font-style: italic; margin: 0;">"Right then, lads. This is what separates the clever dicks from the rest. Thursday picks mean you've got time to think, not panic like everyone else Saturday morning. While they're scrambling around, you're already sorted. That's the edge that wins mini-leagues and keeps the missus happy. The Gaffer's spoken."</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Manage Subscription</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'free-welcome': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #1e40af, #3b82f6); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #e0e7ff; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .feature-box { 
+            background: #1e293b; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid #3b82f6;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .feature-box:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        .feature-title { 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+        .feature-desc { 
+            color: #94a3b8; 
+            font-size: 14px;
+        }
+        .cta-section { 
+            background: #1e293b; 
+            padding: 30px; 
+            text-align: center; 
+            border-radius: 12px; 
+            margin-top: 30px;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .cta-button { 
+            background: linear-gradient(135deg, #1e40af, #3b82f6); 
+            color: white; 
+            padding: 16px 32px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #3b82f6;
+        }
+        .stats { 
+            display: flex; 
+            justify-content: space-around; 
+            margin: 30px 0; 
+        }
+        .stat { 
+            text-align: center; 
+        }
+        .stat-number { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: #3b82f6;
+        }
+        .stat-label { 
+            font-size: 12px; 
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">Welcome to the Tables, Alex!</h1>
+            <p class="subtitle">You've joined 50,000+ FPL managers getting proper Gaffer insights</p>
+        </div>
+        <div class="content">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Active Managers</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">Mini-League Wins</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">4.8★</div>
+                    <div class="stat-label">User Rating</div>
+                </div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-title">📊 Basic Player Statistics</div>
+                <div class="feature-desc">Get essential player data, form guides, and basic analytics to make informed decisions.</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-title">🎯 Weekly Predictions</div>
+                <div class="feature-desc">Access Gaffer's insider knowledge for upcoming fixtures and player performance expectations.</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-title">👥 Community Access</div>
+                <div class="feature-desc">Join discussions, share strategies, and learn from other FPL managers in our community.</div>
+            </div>
+            <div class="cta-section">
+                <h2 style="color: #f1f5f9; margin-bottom: 10px;">Ready to Dominate Your Mini-League?</h2>
+                <p style="color: #94a3b8; margin-bottom: 20px;">Join 25,000+ Season Pass holders with advanced analytics:</p>
+                <a href="#" class="cta-button">Upgrade to Season Pass - £2.99/week</a>
+                <p style="font-size: 12px; color: #94a3b8; margin-top: 15px;">30-day money-back guarantee • Cancel anytime</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'paid-welcome': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #1e40af, #3b82f6); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #e0e7ff; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .premium-badge { 
+            background: linear-gradient(135deg, #f59e0b, #f97316); 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            display: inline-block; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .feature-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            margin: 30px 0; 
+        }
+        .feature-card { 
+            background: #1e293b; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border-left: 4px solid #3b82f6;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .feature-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        .feature-icon { 
+            font-size: 24px; 
+            margin-bottom: 10px;
+        }
+        .feature-title { 
+            font-weight: 700; 
+            color: #f1f5f9; 
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+        .feature-desc { 
+            color: #94a3b8; 
+            font-size: 14px;
+        }
+        .dashboard-cta { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        }
+        .dashboard-button { 
+            background: white; 
+            color: #10b981; 
+            padding: 16px 32px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .dashboard-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="premium-badge">� WEEKLY PASS</div>
+            <h1 class="title">Welcome to the Tables, Alex!</h1>
+            <p class="subtitle">You've unlocked the weekly dose of Gaffer's wisdom</p>
+        </div>
+        <div class="content">
+            <div style="background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2);">
+                <h3 style="color: #60a5fa; margin-bottom: 10px;">📝 A Message from The Gaffer</h3>
+                <p style="color: #94a3b8; font-style: italic;">"Alright mate, cheers for jumping on board! Your weekly pass gets you my proper insights - the kind that'll have your mini-league mates wondering if you've got a crystal ball. No fluff, just proper football talk that actually works. You'll be laughing when you're topping the table!"</p>
+                <p style="color: #94a3b8; margin-top: 10px;">— The Gaffer</p>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #f1f5f9; margin-bottom: 10px;">Your Weekly FPL Advantage Starts Now!</h2>
+                <p style="color: #94a3b8;">You're now getting the good stuff each week - proper analysis that actually wins mini-leagues.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Advanced Analytics</div>
+                    <div class="feature-desc">xG, xA, ICT Index, and predictive modeling</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-title">Weekly Gaffer Insights</div>
+                    <div class="feature-desc">Expert recommendations and predictions from the Gaffer each week</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">�</div>
+                    <div class="feature-title">Weekly Newsletter</div>
+                    <div class="feature-desc">Weekly expert analysis and tips delivered to your inbox</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">Weekly Predictions</div>
+                    <div class="feature-desc">Weekly player recommendations and fixture analysis</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">Mobile Access</div>
+                    <div class="feature-desc">Full mobile experience for weekly insights</div>
+                </div>
+            </div>
+            <div class="dashboard-cta">
+                <h2 style="color: #94a3b8; margin-bottom: 10px;">🚀 Ready to Start Winning?</h2>
+                <p style="color: #94a3b8; margin-bottom: 20px;">Visit premierleaguetables.com and get your weekly FPL advantage:</p>
+                <a href="https://premierleaguetables.com" class="dashboard-button">Visit premierleaguetables.com</a>
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="https://premierleaguetables.com/support" class="dashboard-button" style="background: linear-gradient(135deg, #7c3aed, #2563eb); font-size: 14px; padding: 12px 24px;">Manage Subscription</a>
+                </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #f59e0b, #f97316); color: #f1f5f9; padding: 25px; border-radius: 12px; margin-top: 30px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);">
+                <h3 style="margin-bottom: 10px;">🚀 Want the FULL Season Pass?</h3>
+                <p style="margin-bottom: 15px;">Upgrade to the Season Pass and get everything weekly PLUS:</p>
+                <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                    <li>📊 Advanced analytics and modeling</li>
+                    <li>👥 Elite manager tracking</li>
+                    <li>🎯 Custom predictions</li>
+                    <li>💎 Priority support</li>
+                </ul>
+                <p style="margin-bottom: 20px;"><strong>Only £49.99 for the entire season!</strong></p>
+                <a href="https://premierleaguetables.com/upgrade" style="background: white; color: #f59e0b; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">Upgrade to Season Pass</a>
+                <p style="font-size: 12px; margin-top: 15px; color: #fef3c7;">Save £100+ vs weekly price!</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Manage Subscription</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'thank-you': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #d1fae5; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .success-icon { 
+            font-size: 48px; 
+            color: #10b981; 
+            text-align: center; 
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        .payment-details { 
+            background: #1e293b; 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            border-left: 4px solid #10b981;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .detail-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 10px; 
+        }
+        .detail-label { 
+            color: #94a3b8; 
+            font-size: 14px;
+        }
+        .detail-value { 
+            color: #f1f5f9; 
+            font-weight: 600;
+        }
+        .next-steps { 
+            background: rgba(59, 130, 246, 0.1); 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            border-left: 4px solid #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .step-item { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 15px;
+        }
+        .step-number { 
+            background: linear-gradient(135deg, #3b82f6, #1e40af); 
+            color: white; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            margin-right: 15px; 
+            font-size: 12px;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        .step-text { 
+            color: #f1f5f9;
+        }
+        .dashboard-button { 
+            background: linear-gradient(135deg, #1e40af, #3b82f6); 
+            color: white; 
+            padding: 16px 32px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            display: inline-block; 
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .dashboard-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="success-icon">✅</div>
+            <h1 class="title">Payment Successful!</h1>
+            <p class="subtitle">Welcome to the elite side of FPL management</p>
+        </div>
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #f1f5f9; margin-bottom: 10px;">Thank you, Alex!</h2>
+                <p style="color: #94a3b8;">Your Weekly Pass is now active. You're ready to start dominating your mini-league!</p>
+            </div>
+            <div class="payment-details">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">Payment Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Plan</span>
+                    <span class="detail-value">Weekly Pass</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value">£2.99/week</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Next Billing</span>
+                    <span class="detail-value">March 11, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #10b981; text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);">✅ Active</span>
+                </div>
+            </div>
+            <div class="next-steps">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">What's Next?</h3>
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Access your premium analytics with advanced data</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Set up your custom FPL team preferences</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Explore Gaffer's insider recommendations</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Join our premium community discussions</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://premierleaguetables.com" class="dashboard-button">Visit premierleaguetables.com</a>
+                <div style="margin-top: 15px;">
+                    <a href="https://premierleaguetables.com/support" class="dashboard-button" style="background: linear-gradient(135deg, #7c3aed, #2563eb);">Manage Subscription</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Billing Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'payment-failed': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; 
+            background: #0f172a;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .header { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            padding: 40px 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: white; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title { 
+            color: white; 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle { 
+            color: #fecaca; 
+            font-size: 16px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .content { 
+            padding: 40px 30px; 
+            background: #0f172a;
+        }
+        .warning-icon { 
+            font-size: 48px; 
+            color: #ef4444; 
+            text-align: center; 
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+        .payment-details { 
+            background: #1e293b; 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            border-left: 4px solid #ef4444;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .detail-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 10px; 
+        }
+        .detail-label { 
+            color: #94a3b8; 
+            font-size: 14px;
+        }
+        .detail-value { 
+            color: #f1f5f9; 
+            font-weight: 600;
+        }
+        .action-steps { 
+            background: rgba(239, 68, 68, 0.1); 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            border-left: 4px solid #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .step-item { 
+            display: flex; 
+            align-items: flex-start; 
+            margin-bottom: 15px;
+        }
+        .step-number { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 700; 
+            margin-right: 15px; 
+            font-size: 12px; 
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+        .step-text { 
+            color: #f1f5f9;
+        }
+        .update-button { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white; 
+            padding: 16px 32px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            display: inline-block; 
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .update-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .retry-button { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; 
+            padding: 16px 32px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            display: inline-block; 
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .footer { 
+            background: #1e293b; 
+            color: #94a3b8; 
+            padding: 30px; 
+            text-align: center; 
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }
+        .footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="warning-icon">⚠️</div>
+            <h1 class="title">Payment Failed</h1>
+            <p class="subtitle">We couldn't process your subscription payment</p>
+        </div>
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #f1f5f9; margin-bottom: 10px;">Hi Alex, we need your attention</h2>
+                <p style="color: #94a3b8;">Your recent payment couldn't be processed. Don't worry - we'll help you fix this quickly!</p>
+            </div>
+            <div class="payment-details">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">Payment Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value">£2.99/week</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Card</span>
+                    <span class="detail-value">•••• 4242</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Attempt Date</span>
+                    <span class="detail-value">March 4, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #ef4444;">❌ Failed</span>
+                </div>
+            </div>
+            <div class="action-steps">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">What You Can Do</h3>
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">
+                        <strong>Update your payment method</strong><br>
+                        Add a new card or update your existing card details
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">
+                        <strong>Check with your bank</strong><br>
+                        Ensure your card hasn't been blocked or has sufficient funds
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-text">
+                        <strong>Retry the payment</strong><br>
+                        We'll automatically retry in 3 days, or you can retry now
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+                <a href="#" class="update-button">Update Payment Method</a>
+                <a href="#" class="retry-button">Retry Payment Now</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Billing Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'cancellation': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #6b7280, #4b5563); padding: 40px 30px; text-align: center; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #e5e7eb; font-size: 16px; font-weight: 400; position: relative; z-index: 1; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .sad-icon { font-size: 48px; color: #94a3b8; text-align: center; margin-bottom: 20px; }
+        .cancellation-details { background: #1e293b; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #6b7280; border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .detail-label { color: #94a3b8; font-size: 14px; }
+        .detail-value { color: #f1f5f9; font-weight: 600; }
+        .whats-next { background: rgba(59, 130, 246, 0.1); padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .next-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .next-icon { color: #3b82f6; margin-right: 15px; font-size: 18px; flex-shrink: 0; }
+        .next-text { color: #f1f5f9; }
+        .come-back { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 25px; border-radius: 12px; margin: 20px 0; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3); }
+        .come-back-button { background: white; color: #f59e0b; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .come-back-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .footer { background: #1e293b; color: #94a3b8; padding: 30px; text-align: center; font-size: 12px; border-top: 1px solid #334155; }
+        .footer a { color: #64748b; text-decoration: none; transition: color 0.2s ease; }
+        .footer a:hover { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="sad-icon">😔</div>
+            <h1 class="title">We're Sorry to See You Go</h1>
+            <p class="subtitle">Your Season Pass has been cancelled</p>
+        </div>
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #f1f5f9; margin-bottom: 10px;">Goodbye for now, Alex</h2>
+                <p style="color: #94a3b8;">We're sad to see you leave, but we understand. Thanks for being part of the Hub!</p>
+            </div>
+            <div class="cancellation-details">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">Cancellation Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Cancelled Plan</span>
+                    <span class="detail-value">Season Pass</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Cancellation Date</span>
+                    <span class="detail-value">March 4, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Access Until</span>
+                    <span class="detail-value">March 31, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #6b7280;">🔄 Cancelled</span>
+                </div>
+            </div>
+            <div class="whats-next">
+                <h3 style="color: #1f2937; margin-bottom: 15px;">What Happens Next?</h3>
+                <div class="next-item">
+                    <div class="next-icon">📅</div>
+                    <div class="next-text">
+                        <strong>Access Period</strong><br>
+                        You'll keep premium access until the end of your current billing period
+                    </div>
+                </div>
+                <div class="next-item">
+                    <div class="next-icon">💾</div>
+                    <div class="next-text">
+                        <strong>Data Preservation</strong><br>
+                        Your account data and preferences will be saved for 90 days
+                    </div>
+                </div>
+                <div class="next-item">
+                    <div class="next-icon">📧</div>
+                    <div class="next-text">
+                        <strong>Email Preferences</strong>
+                        <br>
+                        You'll only receive essential account emails (no marketing)
+                    </div>
+                </div>
+            </div>
+            <div class="come-back">
+                <h3 style="margin-bottom: 10px;">🏆 Changed Your Mind?</h3>
+                <p style="margin-bottom: 20px;">We'd love to have you back! Reactivate anytime and pick up where you left off.</p>
+                <a href="#" class="come-back-button">Reactivate Subscription</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Contact Us</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'unsubscribe': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #6b7280, #4b5563); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #e5e7eb; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .success-icon { font-size: 48px; color: #10b981; text-align: center; margin-bottom: 20px; }
+        .confirmation-details { background: white; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #10b981; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .detail-label { color: #6b7280; font-size: 14px; }
+        .detail-value { color: #1f2937; font-weight: 600; }
+        .important-section { background: #fef3c7; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .important-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .important-icon { color: #f59e0b; margin-right: 15px; font-size: 18px; flex-shrink: 0; }
+        .important-text { color: #92400e; }
+        .come-back { background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; padding: 25px; border-radius: 12px; margin: 20px 0; text-align: center; }
+        .resubscribe-button { background: white; color: #3b82f6; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="success-icon">✅</div>
+            <h1 class="title">Successfully Unsubscribed</h1>
+        </div>
+        <div class="content">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1f2937; margin-bottom: 10px;">You're All Set!</h2>
+                <p style="color: #6b7280;">We've successfully removed you from all marketing communications.</p>
+            </div>
+            <div class="confirmation-details">
+                <h3 style="color: #1f2937; margin-bottom: 15px;">Unsubscription Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Unsubscribe Date</span>
+                    <span class="detail-value">March 4, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Marketing Emails</span>
+                    <span class="detail-value" style="color: #10b981;">❌ Stopped</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Account Status</span>
+                    <span class="detail-value">Unchanged</span>
+                </div>
+            </div>
+            <div class="important-section">
+                <h3 style="color: #92400e; margin-bottom: 15px;">📧 Important: What You'll Still Receive</h3>
+                <div class="important-item">
+                    <div class="important-icon">🔐</div>
+                    <div class="important-text">
+                        <strong>Account-related emails</strong><br>
+                        Password resets, login alerts, security notifications
+                    </div>
+                </div>
+                <div class="important-item">
+                    <div class="important-icon">💳</div>
+                    <div class="important-text">
+                        <strong>Billing emails</strong><br>
+                        Payment confirmations, invoices, subscription updates
+                    </div>
+                </div>
+                <div class="important-item">
+                    <div class="important-icon">⚠️</div>
+                    <div class="important-text">
+                        <strong>Service announcements</strong><br>
+                        Critical updates, maintenance notices, policy changes
+                    </div>
+                </div>
+            </div>
+            <div class="come-back">
+                <h3 style="margin-bottom: 10px;">🔄 Changed Your Mind?</h3>
+                <p style="margin-bottom: 20px;">Miss our FPL insights and tips? You can resubscribe anytime with one click!</p>
+                <a href="#" class="resubscribe-button">Resubscribe Now</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Contact Us</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 10px; color: #6b7280;">Premier League Tables, 123 Football Lane, London, UK</p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'season-pass': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #f59e0b, #f97316); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .premium-badge { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 15px; display: inline-block; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #fed7aa; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .gaffer-message { background: #fef3c7; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #f59e0b; }
+        .gaffer-message h3 { color: #92400e; margin-bottom: 10px; }
+        .gaffer-message p { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-message .signature { color: #92400e; text-align: right; font-weight: 600; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .feature-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-left: 4px solid #f59e0b; }
+        .feature-icon { font-size: 24px; margin-bottom: 10px; }
+        .feature-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+        .feature-desc { color: #6b7280; font-size: 14px; }
+        .dashboard-cta { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-top: 30px; }
+        .dashboard-button { background: white; color: #10b981; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="premium-badge">👑 SEASON PASS</div>
+            <h1 class="title">Welcome to the Big League, Alex!</h1>
+            <p class="subtitle">You've unlocked the FULL Gaffer experience - no holding back!</p>
+        </div>
+        <div class="content">
+            <div class="gaffer-message">
+                <h3>📝 A Message from The Gaffer</h3>
+                <p>"Blimey mate, you've gone and done it! The Season Pass gets you EVERYTHING - the full toolbox that'll have your mini-league mates thinking you've got a direct line to Old Trafford itself. This is the proper stuff, none of that half-measured nonsense. You'll be laughing all the way to the top of the table while they're still wondering what hit them!"</p>
+                <p class="signature">— The Gaffer</p>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1f2937; margin-bottom: 10px;">Your Complete FPL Domination Starts NOW!</h2>
+                <p style="color: #6b7280;">You're getting the lot - every tool, every insight, every advantage the Gaffer's got.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Elite Analytics</div>
+                    <div class="feature-desc">Advanced xG, xA, ICT modeling that actually works</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-title">Gaffer's Full Wisdom</div>
+                    <div class="feature-desc">All insider tips, not holding anything back</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-title">Elite Manager Tracking</div>
+                    <div class="feature-desc">Spy on the top 10k managers' every move</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">Custom Predictions</div>
+                    <div class="feature-desc">Personalized recommendations just for you</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <div class="feature-title">Premium Newsletter</div>
+                    <div class="feature-desc">Weekly deep-dive analysis and banter</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💎</div>
+                    <div class="feature-title">Priority Support</div>
+                    <div class="feature-desc">Get your questions answered first</div>
+                </div>
+            </div>
+            <div class="dashboard-cta">
+                <h2 style="margin-bottom: 10px;">🏆 Ready to Absolutely Dominate?</h2>
+                <p style="margin-bottom: 20px;">Get stuck in at premierleaguetables.com and show them how it's done:</p>
+                <a href="https://premierleaguetables.com" class="dashboard-button">Visit premierleaguetables.com</a>
+                <div style="margin-top: 15px; text-align: center;">
+                    <a href="https://premierleaguetables.com/support" class="dashboard-button" style="background: linear-gradient(135deg, #7c3aed, #2563eb); font-size: 14px; padding: 12px 24px;">Manage Subscription</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Manage Subscription</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'thank-you-season': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #f59e0b, #f97316); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .success-icon { font-size: 48px; color: #10b981; text-align: center; margin-bottom: 20px; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #fed7aa; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .gaffer-message { background: #fef3c7; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #f59e0b; }
+        .gaffer-message h3 { color: #92400e; margin-bottom: 10px; }
+        .gaffer-message p { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-message .signature { color: #92400e; text-align: right; font-weight: 600; }
+        .payment-details { background: white; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #10b981; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .detail-label { color: #6b7280; font-size: 14px; }
+        .detail-value { color: #1f2937; font-weight: 600; }
+        .next-steps { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
+        .step-item { display: flex; align-items: center; margin-bottom: 15px; }
+        .step-number { background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; font-size: 12px; }
+        .step-text { color: #1f2937; }
+        .dashboard-button { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; text-align: center; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="success-icon">✅</div>
+            <h1 class="title">Season Pass Payment Successful!</h1>
+            <p class="subtitle">Welcome to the elite side of FPL management</p>
+        </div>
+        <div class="content">
+            <div class="gaffer-message">
+                <h3>📝 A Message from The Gaffer</h3>
+                <p>"Brilliant stuff, mate! You've gone all in with the Season Pass - that's what I like to see! No messing about, straight for the top shelf. You're getting the full arsenal now, everything I've got. Your mini-league mates won't know what's hit them when you start dropping these insights!"</p>
+                <p class="signature">— The Gaffer</p>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1f2937; margin-bottom: 10px;">Thank you, Alex!</h2>
+                <p style="color: #6b7280;">Your Season Pass is now active. You're ready to absolutely dominate your mini-league!</p>
+            </div>
+            <div class="payment-details">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">Payment Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Plan</span>
+                    <span class="detail-value">Season Pass</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value">£49.99/season</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Season</span>
+                    <span class="detail-value">2026/27</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #10b981; text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);">✅ Active</span>
+                </div>
+            </div>
+            <div class="next-steps">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">What's Next?</h3>
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Access your elite analytics dashboard</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Set up your custom FPL team preferences</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Explore Gaffer's complete insider recommendations</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Join our premium community discussions</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="https://premierleaguetables.com" class="dashboard-button">Visit premierleaguetables.com</a>
+                <div style="margin-top: 15px;">
+                    <a href="https://premierleaguetables.com/support" class="dashboard-button" style="background: linear-gradient(135deg, #7c3aed, #2563eb);">Manage Subscription</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Billing Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'payment-failed-season': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #ef4444, #dc2626); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .warning-icon { font-size: 48px; color: #fbbf24; text-align: center; margin-bottom: 20px; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #fecaca; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .gaffer-message { background: #fef2f2; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #ef4444; }
+        .gaffer-message h3 { color: #991b1b; margin-bottom: 10px; }
+        .gaffer-message p { color: #991b1b; font-style: italic; margin-bottom: 10px; }
+        .gaffer-message .signature { color: #991b1b; text-align: right; font-weight: 600; }
+        .payment-details { background: white; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #ef4444; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .detail-label { color: #6b7280; font-size: 14px; }
+        .detail-value { color: #1f2937; font-weight: 600; }
+        .trouble-section { background: #fef3c7; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .trouble-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .trouble-icon { color: #f59e0b; margin-right: 15px; font-size: 18px; flex-shrink: 0; }
+        .trouble-text { color: #92400e; }
+        .update-button { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; text-align: center; }
+        .retry-button { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; text-align: center; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="warning-icon">⚠️</div>
+            <h1 class="title">Season Pass Payment Failed</h1>
+            <p class="subtitle">We couldn't process your Season Pass payment</p>
+        </div>
+        <div class="content">
+            <div class="gaffer-message">
+                <h3>📝 A Message from The Gaffer</h3>
+                <p>"Blimey, mate! Don't panic about the payment hiccup - happens to the best of us! Even the top clubs have the odd banking issue, yeah? Let's get this sorted so you can get back to dominating with the full Season Pass. We'll have you up and running in no time!"</p>
+                <p class="signature">— The Gaffer</p>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1f2937; margin-bottom: 10px;">Hi Alex, we need your attention</h2>
+                <p style="color: #6b7280;">Your Season Pass payment couldn't be processed. Don't worry - we'll help you fix this quickly!</p>
+            </div>
+            <div class="payment-details">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">Payment Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value">£49.99/season</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Card</span>
+                    <span class="detail-value">•••• 4242</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Attempt Date</span>
+                    <span class="detail-value">March 4, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value" style="color: #ef4444;">❌ Failed</span>
+                </div>
+            </div>
+            <div class="trouble-section">
+                <h3 style="color: #1f2937; margin-bottom: 15px;">What might have happened?</h3>
+                <div class="trouble-item">
+                    <div class="trouble-icon">💳</div>
+                    <div class="trouble-text">Insufficient funds or daily spending limit reached</div>
+                </div>
+                <div class="trouble-item">
+                    <div class="trouble-icon">🔒</div>
+                    <div class="trouble-text">Card expired or blocked by your bank</div>
+                </div>
+                <div class="trouble-item">
+                    <div class="trouble-icon">🌐</div>
+                    <div class="trouble-text">Network connectivity issues during payment</div>
+                </div>
+                <div class="trouble-item">
+                    <div class="trouble-icon">🛡️</div>
+                    <div class="trouble-text">Bank's fraud protection triggered</div>
+                </div>
+            </div>
+            <div style="background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                <h3 style="color: #1f2937; margin-bottom: 15px;">What happens next?</h3>
+                <div style="color: #1f2937;">
+                    <p style="margin-bottom: 10px;">• We'll automatically retry the payment in 3 days</p>
+                    <p style="margin-bottom: 10px;">• Your Season Pass access will remain active during this period</p>
+                    <p>• You can update your payment method anytime below</p>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+                <a href="#" class="update-button">Update Payment Method</a>
+                <a href="#" class="retry-button">Retry Payment Now</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Billing Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`,
+            'cancellation-season': `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #f59e0b, #f97316); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .sad-icon { font-size: 48px; color: #f59e0b; text-align: center; margin-bottom: 20px; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #fed7aa; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .gaffer-message { background: #fef3c7; padding: 25px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #f59e0b; }
+        .gaffer-message h3 { color: #92400e; margin-bottom: 10px; }
+        .gaffer-message p { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-message .signature { color: #92400e; text-align: right; font-weight: 600; }
+        .cancellation-details { background: white; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .detail-label { color: #6b7280; font-size: 14px; }
+        .detail-value { color: #1f2937; font-weight: 600; }
+        .whats-next { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
+        .next-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .next-icon { color: #3b82f6; margin-right: 15px; font-size: 18px; flex-shrink: 0; }
+        .next-text { color: #1f2937; }
+        .come-back { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 25px; border-radius: 12px; margin: 20px 0; text-align: center; }
+        .come-back-button { background: white; color: #f59e0b; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <div class="sad-icon">😔</div>
+            <h1 class="title">We're Sorry to See You Go</h1>
+            <p class="subtitle">Your Season Pass has been cancelled</p>
+        </div>
+        <div class="content">
+            <div class="gaffer-message">
+                <h3>📝 A Message from The Gaffer</h3>
+                <p>"Blimey, mate! Really gutted to see you cancel the Season Pass. You were getting the full toolbox - everything I've got to help you dominate! Hope you at least gave your mini-league mates a proper scare while you had the insider knowledge. Door's always open if you want to come back and show them who's boss again!"</p>
+                <p class="signature">— The Gaffer</p>
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #f1f5f9; margin-bottom: 10px;">Goodbye for now, Alex</h2>
+                <p style="color: #94a3b8;">We're sad to see you leave, but we understand. Thanks for being part of the Hub!</p>
+            </div>
+            <div class="cancellation-details">
+                <h3 style="color: #f1f5f9; margin-bottom: 15px;">Cancellation Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Cancelled Plan</span>
+                    <span class="detail-value">Season Pass</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Cancellation Date</span>
+                    <span class="detail-value">March 4, 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Access Until</span>
+                    <span class="detail-value">End of 2026/27 Season</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Refund Policy</span>
+                    <span class="detail-value" style="color: #10b981;">✅ Pro-rated refund available</span>
+                </div>
+            </div>
+            <div class="whats-next">
+                <h3 style="color: #1f2937; margin-bottom: 15px;">What happens to your account?</h3>
+                <div class="next-item">
+                    <div class="next-icon">📊</div>
+                    <div class="next-text">Your Season Pass access continues until season end</div>
+                </div>
+                <div class="next-item">
+                    <div class="next-icon">💾</div>
+                    <div class="next-text">All your data and preferences are saved</div>
+                </div>
+                <div class="next-item">
+                    <div class="next-icon">📧</div>
+                    <div class="next-text">You'll keep getting our free newsletter</div>
+                </div>
+                <div class="next-item">
+                    <div class="next-icon">🔄</div>
+                    <div class="next-text">You can reactivate anytime before season ends</div>
+                </div>
+            </div>
+            <div class="come-back">
+                <h3 style="margin-bottom: 10px;">🏆 Changed Your Mind?</h3>
+                <p style="margin-bottom: 20px;">We'd love to have you back! Reactivate anytime and pick up where you left off.</p>
+                <a href="#" class="come-back-button">Reactivate Season Pass</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Contact Us</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>`
+        };
+
+        // Add themed auto-reply templates
+        emailTemplates['auto-reply-feedback'] = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #e0e7ff; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .feature-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
+        .feature-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+        .feature-desc { color: #6b7280; font-size: 14px; }
+        .cta-section { background: white; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
+        .cta-button { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+        .stats { display: flex; justify-content: space-around; margin: 30px 0; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .reply-info { background: #fef3c7; padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .reply-text { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-quote { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
+        .gaffer-text { color: #1e40af; font-style: italic; margin-bottom: 10px; line-height: 1.6; }
+        .gaffer-signature { color: #1e40af; font-weight: bold; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">Thanks for Your Feedback! 🏆</h1>
+            <p class="subtitle">The Gaffer's FPL Intelligence</p>
+        </div>
+        <div class="content">
+            <div class="reply-info">
+                <h3 style="color: #92400e; margin-bottom: 10px;">📧 Your Original Message:</h3>
+                <p class="reply-text">"Great captain picks this week! Haaland was spot on!"</p>
+                <p style="color: #92400e; font-size: 12px; margin: 5px 0 0 0;">Reply from: user@example.com</p>
+            </div>
+            <div class="feature-box">
+                <h3 class="feature-title">Hi User,</h3>
+                <p class="feature-desc" style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                    We really appreciate hearing from our community and your input helps us improve the Gaffer's insights and automated features.
+                </p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Active Managers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-label">Mini-League Wins</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4.8★</div>
+                        <div class="stat-label">User Rating</div>
+                    </div>
+                </div>
+            </div>
+            <div class="gaffer-quote">
+                <h3 style="color: #1e40af; margin-bottom: 10px;">🗣️ The Gaffer Says:</h3>
+                <p class="gaffer-text">Brilliant feedback! That's exactly what helps us improve. Keep those insights coming - that's how we stay ahead of the competition!</p>
+                <p class="gaffer-signature">— The Gaffer</p>
+            </div>
+            <div class="cta-section">
+                <h3 style="color: #1f2937; margin-bottom: 10px;">Have more suggestions?</h3>
+                <p style="color: #6b7280; margin-bottom: 20px;">Keep dominating those mini-leagues with our expert insights!</p>
+                <a href="https://premierleaguetables.com/support" class="cta-button">Share More Ideas</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 11px; color: #6b7280;">This is an automated response. For human support, visit premierleaguetables.com/support</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">🚀 Discord Community launching July 15, 2024 - Join 500+ FPL managers!</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">You replied to: "Great captain picks this week! Haaland was spot on!" from user@example.com</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+        emailTemplates['auto-reply-support'] = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #e0e7ff; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .feature-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
+        .feature-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+        .feature-desc { color: #6b7280; font-size: 14px; }
+        .cta-section { background: white; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
+        .cta-button { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+        .stats { display: flex; justify-content: space-around; margin: 30px 0; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .reply-info { background: #fef3c7; padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .reply-text { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-quote { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
+        .gaffer-text { color: #1e40af; font-style: italic; margin-bottom: 10px; line-height: 1.6; }
+        .gaffer-signature { color: #1e40af; font-weight: bold; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">We're Here to Help! 🎯</h1>
+            <p class="subtitle">The Gaffer's FPL Intelligence</p>
+        </div>
+        <div class="content">
+            <div class="reply-info">
+                <h3 style="color: #92400e; margin-bottom: 10px;">📧 Your Original Message:</h3>
+                <p class="reply-text">"Help! I can't access my premium features"</p>
+                <p style="color: #92400e; font-size: 12px; margin: 5px 0 0 0;">Reply from: user@example.com</p>
+            </div>
+            <div class="feature-box">
+                <h3 class="feature-title">Hi User,</h3>
+                <p class="feature-desc" style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                    This is an automated email address, but we want to help you succeed in your FPL mini-league.
+                </p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Active Managers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-label">Mini-League Wins</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4.8★</div>
+                        <div class="stat-label">User Rating</div>
+                    </div>
+                </div>
+            </div>
+            <div class="gaffer-quote">
+                <h3 style="color: #1e40af; margin-bottom: 10px;">🗣️ The Gaffer Says:</h3>
+                <p class="gaffer-text">Don't worry about technical issues! We've got your back. Every manager deserves a fair shot at mini-league glory!</p>
+                <p class="gaffer-signature">— The Gaffer</p>
+            </div>
+            <div class="cta-section">
+                <h3 style="color: #1f2937; margin-bottom: 10px;">Need immediate help?</h3>
+                <p style="color: #6b7280; margin-bottom: 20px;">Keep winning those mini-leagues with our expert insights!</p>
+                <a href="https://premierleaguetables.com/support" class="cta-button">Get Support</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 11px; color: #6b7280;">This is an automated response. For human support, visit premierleaguetables.com/support</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">🚀 Discord Community launching July 15, 2024 - Join 500+ FPL managers!</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">You replied to: "Help! I can't access my premium features" from user@example.com</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+        emailTemplates['auto-reply-unsubscribe'] = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #e0e7ff; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .feature-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
+        .feature-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+        .feature-desc { color: #6b7280; font-size: 14px; }
+        .cta-section { background: white; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
+        .cta-button { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+        .stats { display: flex; justify-content: space-around; margin: 30px 0; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .reply-info { background: #fef3c7; padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .reply-text { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-quote { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
+        .gaffer-text { color: #1e40af; font-style: italic; margin-bottom: 10px; line-height: 1.6; }
+        .gaffer-signature { color: #1e40af; font-weight: bold; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">Sorry to See You Go! 😔</h1>
+            <p class="subtitle">The Gaffer's FPL Intelligence</p>
+        </div>
+        <div class="content">
+            <div class="reply-info">
+                <h3 style="color: #92400e; margin-bottom: 10px;">📧 Your Original Message:</h3>
+                <p class="reply-text">"Please unsubscribe me"</p>
+                <p style="color: #92400e; font-size: 12px; margin: 5px 0 0 0;">Reply from: user@example.com</p>
+            </div>
+            <div class="feature-box">
+                <h3 class="feature-title">Hi User,</h3>
+                <p class="feature-desc" style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                    We're sorry to see you go! If you're having trouble unsubscribing, we're here to help manually.
+                </p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Active Managers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-label">Mini-League Wins</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4.8★</div>
+                        <div class="stat-label">User Rating</div>
+                    </div>
+                </div>
+            </div>
+            <div class="gaffer-quote">
+                <h3 style="color: #1e40af; margin-bottom: 10px;">🗣️ The Gaffer Says:</h3>
+                <p class="gaffer-text">Sad to see you go, but I understand! Sometimes you need a break. The door's always open when you're ready to dominate again!</p>
+                <p class="gaffer-signature">— The Gaffer</p>
+            </div>
+            <div class="cta-section">
+                <h3 style="color: #1f2937; margin-bottom: 10px;">Ready to unsubscribe?</h3>
+                <p style="color: #6b7280; margin-bottom: 20px;">Hope to see you back when the next FPL season starts!</p>
+                <a href="https://premierleaguetables.com/unsubscribe" class="cta-button">Unsubscribe Now</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 11px; color: #6b7280;">This is an automated response. For human support, visit premierleaguetables.com/support</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">🚀 Discord Community launching July 15, 2024 - Join 500+ FPL managers!</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">You replied to: "Please unsubscribe me" from user@example.com</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+        emailTemplates['auto-reply-other'] = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 40px 30px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 700; color: white; margin-bottom: 20px; position: relative; z-index: 1; }
+        .title { color: white; font-size: 28px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.025em; position: relative; z-index: 1; }
+        .subtitle { color: #e0e7ff; font-size: 16px; }
+        .content { padding: 40px 30px; background: #0f172a; }
+        .feature-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
+        .feature-title { font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+        .feature-desc { color: #6b7280; font-size: 14px; }
+        .cta-section { background: white; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
+        .cta-button { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; }
+        .footer { background: #1f2937; color: white; padding: 30px; text-align: center; font-size: 12px; }
+        .stats { display: flex; justify-content: space-around; margin: 30px 0; }
+        .stat { text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .reply-info { background: #fef3c7; padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+        .reply-text { color: #92400e; font-style: italic; margin-bottom: 10px; }
+        .gaffer-quote { background: #f0f9ff; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #3b82f6; }
+        .gaffer-text { color: #1e40af; font-style: italic; margin-bottom: 10px; line-height: 1.6; }
+        .gaffer-signature { color: #1e40af; font-weight: bold; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚽ premierleaguetables.com</div>
+            <h1 class="title">Thanks for Reaching Out! 📧</h1>
+            <p class="subtitle">The Gaffer's FPL Intelligence</p>
+        </div>
+        <div class="content">
+            <div class="reply-info">
+                <h3 style="color: #92400e; margin-bottom: 10px;">📧 Your Original Message:</h3>
+                <p class="reply-text">"Hello from a happy user!"</p>
+                <p style="color: #92400e; font-size: 12px; margin: 5px 0 0 0;">Reply from: user@example.com</p>
+            </div>
+            <div class="feature-box">
+                <h3 class="feature-title">Hi User,</h3>
+                <p class="feature-desc" style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                    This is an automated email address for our FPL newsletter system. We love hearing from our community!
+                </p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Active Managers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-label">Mini-League Wins</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4.8★</div>
+                        <div class="stat-label">User Rating</div>
+                    </div>
+                </div>
+            </div>
+            <div class="gaffer-quote">
+                <h3 style="color: #1e40af; margin-bottom: 10px;">🗣️ The Gaffer Says:</h3>
+                <p class="gaffer-text">Great to hear from you! The community is what makes this special. Keep pushing those mini-league boundaries!</p>
+                <p class="gaffer-signature">— The Gaffer</p>
+            </div>
+            <div class="cta-section">
+                <h3 style="color: #1f2937; margin-bottom: 10px;">Looking for something specific?</h3>
+                <p style="color: #6b7280; margin-bottom: 20px;">Keep dominating those mini-leagues with our expert insights!</p>
+                <a href="https://premierleaguetables.com" class="cta-button">Visit Site</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 premierleaguetables.com. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms</a>
+                <a href="#" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Unsubscribe</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 11px; color: #6b7280;">This is an automated response. For human support, visit premierleaguetables.com/support</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">🚀 Discord Community launching July 15, 2024 - Join 500+ FPL managers!</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #6b7280;">You replied to: "Hello from a happy user!" from user@example.com</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+        // Email title mapping
+        const emailTitles = {
+            'weekly-digest': 'Weekly Intelligence Digest',
+            'price-intelligence': 'Price Intelligence Alert',
+            'captain-picks-free': 'Captain Picks (Free Tier)',
+            'captain-picks-paid': 'Elite Captain Picks (Paid)',
+            'free-welcome': 'Free Welcome Email',
+            'paid-welcome': 'First Team Welcome',
+            'season-pass': 'Season Pass Welcome',
+            'thank-you': 'Payment Success',
+            'thank-you-season': 'Season Pass Success',
+            'payment-failed': 'Payment Failed',
+            'payment-failed-season': 'Season Pass Payment Failed',
+            'cancellation': 'First Team Cancellation',
+            'cancellation-season': 'Season Pass Cancellation',
+            'unsubscribe': 'Unsubscribe Confirmation',
+            'auto-reply-feedback': 'Auto-Reply: Feedback',
+            'auto-reply-support': 'Auto-Reply: Support',
+            'auto-reply-unsubscribe': 'Auto-Reply: Unsubscribe',
+            'auto-reply-other': 'Auto-Reply: General'
+        };
+
+        let currentTemplate = 'captain-picks-free';
+
+        function showEmail(templateId) {
+            const frame = document.getElementById('emailFrame');
+            const titleElement = document.getElementById('emailTitle');
+            const template = emailTemplates[templateId];
+            
+            if (template) {
+                frame.srcdoc = template;
+                titleElement.textContent = emailTitles[templateId] || 'Email Preview';
+                currentTemplate = templateId;
+                
+                // Update active button
+                document.querySelectorAll('.email-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.closest('.email-btn').classList.add('active');
+            }
+        }
+
+        // Email Editor System
+        let isEditMode = false;
+        let originalTemplates = { ...emailTemplates };
+        let editedContent = {};
+
+        // Load saved edits from localStorage
+        function loadSavedEdits() {
+            const saved = localStorage.getItem('emailTemplateEdits');
+            if (saved) {
+                editedContent = JSON.parse(saved);
+                // Apply saved edits to templates
+                Object.keys(editedContent).forEach(templateId => {
+                    if (emailTemplates[templateId]) {
+                        emailTemplates[templateId] = editedContent[templateId];
+                    }
+                });
+            }
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const frame = document.getElementById('emailFrame');
+            const editBtn = document.getElementById('editBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            if (isEditMode) {
+                enableEditing();
+                editBtn.textContent = 'Preview Mode';
+                editBtn.classList.add('editing');
+                saveBtn.style.display = 'inline-block';
+                resetBtn.style.display = 'inline-block';
+                frame.style.border = '3px solid #667eea';
+            } else {
+                disableEditing();
+                editBtn.textContent = 'Edit Mode';
+                editBtn.classList.remove('editing');
+                saveBtn.style.display = 'none';
+                resetBtn.style.display = 'none';
+                frame.style.border = '1px solid #e5e7eb';
+            }
+        }
+
+        // Enable editing in iframe
+        function enableEditing() {
+            const frame = document.getElementById('emailFrame');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            // Make text elements editable
+            const editableElements = frameDoc.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span, div, a, td, th');
+            editableElements.forEach(el => {
+                el.contentEditable = true;
+                el.style.outline = 'none';
+                el.style.transition = 'background-color 0.2s';
+                
+                // Add hover effect
+                el.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+                });
+                
+                el.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'transparent';
+                });
+                
+                // Add input event to track changes
+                el.addEventListener('input', function() {
+                    markAsChanged();
+                });
+            });
+        }
+
+        // Disable editing
+        function disableEditing() {
+            const frame = document.getElementById('emailFrame');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            // Remove contenteditable from all elements
+            const editableElements = frameDoc.querySelectorAll('[contenteditable="true"]');
+            editableElements.forEach(el => {
+                el.contentEditable = false;
+                el.style.backgroundColor = 'transparent';
+                el.removeEventListener('mouseenter', null);
+                el.removeEventListener('mouseleave', null);
+                el.removeEventListener('input', null);
+            });
+        }
+
+        // Mark template as changed
+        function markAsChanged() {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.textContent = 'Save Changes *';
+            saveBtn.style.backgroundColor = '#10b981';
+        }
+
+        // Save changes
+        function saveChanges() {
+            const frame = document.getElementById('emailFrame');
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            
+            // Get the edited content
+            const editedHTML = frameDoc.documentElement.outerHTML;
+            
+            // Save to current template
+            emailTemplates[currentTemplate] = editedHTML;
+            editedContent[currentTemplate] = editedHTML;
+            
+            // Save to localStorage
+            localStorage.setItem('emailTemplateEdits', JSON.stringify(editedContent));
+            
+            // Update UI
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.textContent = 'Saved ✓';
+            saveBtn.style.backgroundColor = '#059669';
+            
+            setTimeout(() => {
+                saveBtn.textContent = 'Save Changes';
+                saveBtn.style.backgroundColor = '#667eea';
+            }, 2000);
+        }
+
+        // Reset to original
+        function resetToOriginal() {
+            if (confirm('Are you sure you want to reset this template to the original version? All changes will be lost.')) {
+                emailTemplates[currentTemplate] = originalTemplates[currentTemplate];
+                delete editedContent[currentTemplate];
+                localStorage.setItem('emailTemplateEdits', JSON.stringify(editedContent));
+                refreshEmail();
+                
+                if (isEditMode) {
+                    setTimeout(enableEditing, 100);
+                }
+            }
+        }
+
+        // Export edited templates
+        function exportTemplates() {
+            const dataStr = JSON.stringify(editedContent, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'email-templates-edited.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import edited templates
+        function importTemplates() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        editedContent = imported;
+                        emailTemplates = { ...originalTemplates, ...imported };
+                        localStorage.setItem('emailTemplateEdits', JSON.stringify(editedContent));
+                        refreshEmail();
+                        alert('Templates imported successfully!');
+                    } catch (error) {
+                        alert('Error importing templates: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function refreshEmail() {
+            const frame = document.getElementById('emailFrame');
+            frame.srcdoc = emailTemplates[currentTemplate];
+        }
+
+        function openInNewTab() {
+            const newWindow = window.open();
+            newWindow.document.write(emailTemplates[currentTemplate]);
+            newWindow.document.close();
+        }
+
+        // Load saved edits on page load
+        window.onload = function() {
+            loadSavedEdits();
+            showEmail('captain-picks-free');
+        };
+    </script>
+</body>
+</html>

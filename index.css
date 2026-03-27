@@ -1,0 +1,119 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom responsive styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
+/* Responsive fixes */
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Mobile-first responsive grid */
+  .responsive-grid {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  /* Weather widget responsive */
+  .weather-widget {
+    @apply w-16 sm:w-20 text-center;
+  }
+  
+  /* Fixture card responsive */
+  .fixture-card {
+    @apply p-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors flex flex-col md:flex-row items-center justify-between gap-4 group;
+  }
+  
+  /* Team logos responsive */
+  .team-logo {
+    @apply w-8 h-8 md:w-10 md:h-10 shrink-0 transition-transform group-hover:scale-110;
+  }
+  
+  /* Difficulty badges responsive */
+  .difficulty-badge {
+    @apply text-[8px] sm:text-[10px] font-black px-1.5 py-0.5 rounded;
+  }
+  
+  /* Weather icon responsive */
+  .weather-icon {
+    @apply text-lg sm:text-xl;
+  }
+  
+  /* Temperature badge responsive */
+  .temp-badge {
+    @apply absolute -top-1 -right-1 text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300;
+  }
+  
+  /* Weather tooltip responsive */
+  .weather-tooltip {
+    @apply hidden group-hover:flex flex-col gap-1 absolute z-20 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 shadow-lg mt-8 min-w-[100px] sm:min-w-[120px];
+  }
+}
+
+/* Dark mode transitions */
+@layer utilities {
+  .transition-theme {
+    @apply transition-colors duration-300;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn-primary {
+    @apply border-2 border-current;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin {
+    animation: none !important;
+  }
+  
+  .transition-transform {
+    transition: none !important;
+  }
+}
+
+/* Mobile landscape fixes */
+@media (max-width: 768px) and (orientation: landscape) {
+  .fixture-card {
+    @apply py-2;
+  }
+  
+  .weather-widget {
+    @apply w-12;
+  }
+}
+
+/* Tablet portrait fixes */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .responsive-grid {
+    @apply grid-cols-2;
+  }
+}

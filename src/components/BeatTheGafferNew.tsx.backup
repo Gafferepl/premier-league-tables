@@ -1,0 +1,1223 @@
+import React, { useState, useEffect } from 'react';
+import { getTeamLogo } from '../constants';
+import LogoWithFallback from './LogoWithFallback';
+import CountryIcon from './CountryIcon';
+import CountryDropdown from './CountryDropdown';
+import ClubDropdown from './ClubDropdown';
+import { authService } from '../services/auth';
+import { apiService } from '../services/apiService';
+import { transformFPLFixture } from '../services/dataTransformer';
+import { Fixture } from '../../types';
+
+// Email validation function
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isRandomChars = /^[a-zA-Z]{1,3}$/.test(email) || /^\d+$/.test(email);
+  return emailRegex.test(email) && !isRandomChars && email.length > 5;
+};
+
+// Cookie functions
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+};
+
+const getCookie = (name: string): string => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return '';
+};
+
+// Admin email that bypasses weekly play limit
+const ADMIN_EMAIL = 'ellerkerdavid@gmail.com';
+
+// Get the current week key (e.g. "2026-W08")
+const getCurrentWeekKey = (): string => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+  const weekNumber = Math.ceil((dayOfYear + startOfYear.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
+};
+
+// Check if a user has already played this week
+const hasPlayedThisWeek = (email: string): boolean => {
+  if (email.toLowerCase() === ADMIN_EMAIL) return false; // Admin override
+  const weekKey = getCurrentWeekKey();
+  const played = localStorage.getItem(`btg_played_${email.toLowerCase()}_${weekKey}`);
+  return played === 'true';
+};
+
+// Mark a user as having played this week
+const markAsPlayed = (email: string): void => {
+  if (email.toLowerCase() === ADMIN_EMAIL) return; // Don't mark admin
+  const weekKey = getCurrentWeekKey();
+  localStorage.setItem(`btg_played_${email.toLowerCase()}_${weekKey}`, 'true');
+};
+
+// Mock data for local testing
+const MOCK_FIXTURES: Fixture[] = [
+  {
+    id: '1',
+    homeTeam: 'Manchester City',
+    awayTeam: 'Liverpool',
+    date: '2024-01-15T15:00:00Z',
+    status: 'upcoming'
+  },
+  {
+    id: '2', 
+    homeTeam: 'Arsenal',
+    awayTeam: 'Chelsea',
+    date: '2024-01-15T17:30:00Z',
+    status: 'upcoming'
+  },
+  {
+    id: '3',
+    homeTeam: 'Manchester United', 
+    awayTeam: 'Tottenham',
+    date: '2024-01-16T20:00:00Z',
+    status: 'upcoming'
+  },
+  {
+    id: '4',
+    homeTeam: 'Newcastle',
+    awayTeam: 'Aston Villa',
+    date: '2024-01-16T19:45:00Z', 
+    status: 'upcoming'
+  },
+  {
+    id: '5',
+    homeTeam: 'Brighton',
+    awayTeam: 'West Ham',
+    date: '2024-01-17T19:30:00Z',
+    status: 'upcoming'
+  }
+];
+
+// Mock leaderboard data
+const MOCK_LEADERBOARD = [
+  { rank: 1, name: 'Alex Johnson', club: 'Manchester City', country: 'England', points: 12, beatGaffer: true },
+  { rank: 2, name: 'Sarah Williams', club: 'Liverpool', country: 'Wales', points: 10, beatGaffer: true },
+  { rank: 3, name: 'Mike Chen', club: 'Arsenal', country: 'China', points: 9, beatGaffer: false },
+  { rank: 4, name: 'Emma Davis', club: 'Chelsea', country: 'Scotland', points: 8, beatGaffer: false },
+  { rank: 5, name: 'Tom Wilson', club: 'Manchester United', country: 'England', points: 7, beatGaffer: true }
+];
+
+// Mock Gaffer predictions
+const GAFFER_PREDICTIONS: { [key: string]: 'home' | 'draw' | 'away' } = {
+  '1': 'home',
+  '2': 'draw', 
+  '3': 'away',
+  '4': 'home',
+  '5': 'draw'
+};
+
+// World Cup 2026 Qualifying Nations (48 teams) - Using flag images instead of emojis
+const COUNTRY_FLAGS: { [key: string]: string } = {
+  // UK Nations (prioritized for UK-based site)
+  'England': 'https://flagcdn.com/w40/gb-eng.png',
+  'Wales': 'https://flagcdn.com/w40/gb-wls.png',
+  'Scotland': 'https://flagcdn.com/w40/gb-sct.png',
+  'Northern Ireland': 'https://flagcdn.com/w40/gb-nir.png',
+  'Ireland': 'https://flagcdn.com/w40/ie.png',
+  
+  // Europe (Qualified)
+  'Germany': 'https://flagcdn.com/w40/de.png',
+  'France': 'https://flagcdn.com/w40/fr.png',
+  'Spain': 'https://flagcdn.com/w40/es.png',
+  'Portugal': 'https://flagcdn.com/w40/pt.png',
+  'Belgium': 'https://flagcdn.com/w40/be.png',
+  'Netherlands': 'https://flagcdn.com/w40/nl.png',
+  'Croatia': 'https://flagcdn.com/w40/hr.png',
+  'Switzerland': 'https://flagcdn.com/w40/ch.png',
+  'Italy': 'https://flagcdn.com/w40/it.png',
+  'Poland': 'https://flagcdn.com/w40/pl.png',
+  'Austria': 'https://flagcdn.com/w40/at.png',
+  'Denmark': 'https://flagcdn.com/w40/dk.png',
+  'Hungary': 'https://flagcdn.com/w40/hu.png',
+  'Serbia': 'https://flagcdn.com/w40/rs.png',
+  'Romania': 'https://flagcdn.com/w40/ro.png',
+  'Ukraine': 'https://flagcdn.com/w40/ua.png',
+  'Czech Republic': 'https://flagcdn.com/w40/cz.png',
+  'Slovakia': 'https://flagcdn.com/w40/sk.png',
+  'Slovenia': 'https://flagcdn.com/w40/si.png',
+  
+  // South America (Qualified)
+  'Argentina': 'https://flagcdn.com/w40/ar.png',
+  'Brazil': 'https://flagcdn.com/w40/br.png',
+  'Uruguay': 'https://flagcdn.com/w40/uy.png',
+  'Colombia': 'https://flagcdn.com/w40/co.png',
+  'Ecuador': 'https://flagcdn.com/w40/ec.png',
+  'Peru': 'https://flagcdn.com/w40/pe.png',
+  'Chile': 'https://flagcdn.com/w40/cl.png',
+  'Bolivia': 'https://flagcdn.com/w40/bo.png',
+  'Paraguay': 'https://flagcdn.com/w40/py.png',
+  'Venezuela': 'https://flagcdn.com/w40/ve.png',
+  
+  // North America (Qualified)
+  'USA': 'https://flagcdn.com/w40/us.png',
+  'Mexico': 'https://flagcdn.com/w40/mx.png',
+  'Canada': 'https://flagcdn.com/w40/ca.png',
+  'Costa Rica': 'https://flagcdn.com/w40/cr.png',
+  'Panama': 'https://flagcdn.com/w40/pa.png',
+  'Jamaica': 'https://flagcdn.com/w40/jm.png',
+  'Honduras': 'https://flagcdn.com/w40/hn.png',
+  'Trinidad & Tobago': 'https://flagcdn.com/w40/tt.png',
+  
+  // Africa (Qualified)
+  'Morocco': 'https://flagcdn.com/w40/ma.png',
+  'Senegal': 'https://flagcdn.com/w40/sn.png',
+  'Tunisia': 'https://flagcdn.com/w40/tn.png',
+  'Cameroon': 'https://flagcdn.com/w40/cm.png',
+  'Ghana': 'https://flagcdn.com/w40/gh.png',
+  'Nigeria': 'https://flagcdn.com/w40/ng.png',
+  'Ivory Coast': 'https://flagcdn.com/w40/ci.png',
+  'Egypt': 'https://flagcdn.com/w40/eg.png',
+  'Algeria': 'https://flagcdn.com/w40/dz.png',
+  'South Africa': 'https://flagcdn.com/w40/za.png',
+  
+  // Asia (Qualified)
+  'Japan': 'https://flagcdn.com/w40/jp.png',
+  'South Korea': 'https://flagcdn.com/w40/kr.png',
+  'Iran': 'https://flagcdn.com/w40/ir.png',
+  'Saudi Arabia': 'https://flagcdn.com/w40/sa.png',
+  'Australia': 'https://flagcdn.com/w40/au.png',
+  'Qatar': 'https://flagcdn.com/w40/qa.png',
+  'Iraq': 'https://flagcdn.com/w40/iq.png',
+  'UAE': 'https://flagcdn.com/w40/ae.png',
+  'Uzbekistan': 'https://flagcdn.com/w40/uz.png',
+  
+  // Intercontinental Playoffs (Qualified)
+  'New Zealand': 'https://flagcdn.com/w40/nz.png'
+};
+
+const COUNTRIES = Object.keys(COUNTRY_FLAGS);
+
+// Premier League clubs for dropdown
+const PREMIER_LEAGUE_CLUBS = [
+  'Manchester City', 'Arsenal', 'Liverpool', 'Chelsea', 'Manchester United',
+  'Newcastle', 'Brighton', 'West Ham', 'Aston Villa', 'Tottenham',
+  'Fulham', 'Brentford', 'Crystal Palace', 'Wolves', 'Leicester',
+  'Everton', 'Nottingham Forest', 'Bournemouth', 'Luton Town', 'Burnley',
+  'Sheffield United'
+];
+
+interface UserPrediction {
+  matchId: string;
+  prediction: 'home' | 'draw' | 'away';
+}
+
+interface UserProfile {
+  name: string;
+  email: string;
+  club: string;
+  country: string;
+}
+
+const BeatTheGafferNew: React.FC = () => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [gameState, setGameState] = useState<'intro' | 'signup' | 'playing' | 'results' | 'leaderboard'>('intro');
+  const [predictions, setPredictions] = useState<UserPrediction[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: '',
+    email: '',
+    club: '',
+    country: ''
+  });
+  const [selectedMatches, setSelectedMatches] = useState<Fixture[]>([]);
+  const [userScore, setUserScore] = useState(0);
+  const [gafferScore, setGafferScore] = useState(0);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [buttonText, setButtonText] = useState('📊 Points Are Sanity - Show Results');
+
+  // Scroll to top of component on every state change
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [gameState]);
+
+  // Enhanced Gaffer Button Suggestions
+  const GAFFER_BUTTON_SUGGESTIONS = {
+    classicManagerWisdom: [
+      "📊 Points Are Sanity - Show Results",
+      "🏆 Ugly Win? No Such Thing - Show Results",
+      "⚽ Proper Performance - Show Results",
+      "📈 Left It All On The Pitch - Show Results",
+      "🎯 Blood, Sweat, and Yellow Cards - Show Results"
+    ],
+    varRants: [
+      "🤖 No VAR Needed Here - Show Results",
+      "⚡ Faster Than VAR Review - Show Results",
+      "📺 Post-Match Analysis - No Video Ref Required",
+      "🏁 Full-Time Whistle - Show Results",
+      "⏰ Injury Time Over - Show Results"
+    ],
+    pieCulture: [
+      "🥧 Half-Time Analysis - Show Results",
+      "🍺 Time for the Pint and Predictions",
+      "📊 The Gaffer's Tea Break Verdict",
+      "🏆 Touchline Talk - Show Results",
+      "📋 Dugout Decisions - Show Results"
+    ],
+    managerSpeak: [
+      "🎯 The Gaffer's Crystal Ball",
+      "📊 My Notebook Says...",
+      "🏆 The Board Room Results",
+      "⚽ The Gaffer's Gut Feeling",
+      "📈 The Manager's Assessment"
+    ],
+    selfDeprecating: [
+      "🤔 Even I Get These Right Sometimes",
+      "🍕 Before My Pizza Arrives - Show Results",
+      "⏰ The Chairman's Waiting - Show Results",
+      "📱 My Agent's Calling - Show Results Quick",
+      "🥧 Need Another Pie - Show Results"
+    ],
+    interactive: [
+      "🎯 Beat the Gaffer? Let's See",
+      "⚽ Your Predictions vs The Gaffer",
+      "🏆 Who's the Real Manager Here?",
+      "📊 Time to Face the Music",
+      "🎮 Game Over - Show Results"
+    ],
+    deepCuts: [
+      "📊 Possession Is Vanity - Show Results",
+      "🏆 Parked the Bus and Smashed 'Em",
+      "⚡ All Gear, No Idea? Let's See",
+      "🎯 Barn Door Test - Show Results",
+      "📋 Two Halves - Let's See the Score"
+    ]
+  };
+
+  // Context-aware button text selection
+  const getButtonText = () => {
+    // Always prioritize the top recommendation from the plan
+    return "📊 Points Are Sanity - Show Results";
+    
+    // Time-based context (commented out to prioritize the main message)
+    /*
+    const hour = new Date().getHours();
+    const isWeekend = new Date().getDay() % 6 === 0;
+    
+    // Time-based context
+    if (hour >= 14 && hour <= 17) {
+      // During typical match times
+      return "🏁 Full-Time Whistle - Show Results";
+    } else if (hour >= 12 && hour <= 14) {
+      // Half-time
+      return "🥧 Half-Time Analysis - Show Results";
+    } else if (hour >= 18 && hour <= 22) {
+      // Post-match analysis time
+      return "📺 Post-Match Analysis - No Video Ref Required";
+    }
+    
+    // Weekend vs weekday
+    if (isWeekend) {
+      return "🍺 Time for the Pint and Predictions";
+    }
+    
+    // Default - rotate through classic wisdom
+    const allSuggestions = Object.values(GAFFER_BUTTON_SUGGESTIONS).flat();
+    const randomIndex = Math.floor(Math.random() * allSuggestions.length);
+    return allSuggestions[randomIndex];
+    */
+  };
+
+  // Update button text when component mounts
+  useEffect(() => {
+    setButtonText(getButtonText());
+  }, []);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [agreeToEmails, setAgreeToEmails] = useState(true); // Auto-selected
+
+  // Check for existing user data using AuthService on mount
+  useEffect(() => {
+    const currentUser = authService.getCurrentUser();
+    
+    if (currentUser) {
+      setUserProfile({
+        name: currentUser.username,
+        email: currentUser.email,
+        club: currentUser.team,
+        country: 'England' // Default country since AuthService doesn't store it
+      });
+      // Check if user already played this week
+      if (hasPlayedThisWeek(currentUser.email)) {
+        setGameState('leaderboard');
+      } else {
+        setGameState('playing');
+      }
+    }
+
+    // Clear cache and load fresh fixtures from API for testing
+    console.log('🔄 Clearing cache and loading fresh data...');
+    apiService.clearCache();
+    loadFixtures();
+  }, []);
+
+  // Load fixtures from API with fallback
+  const loadFixtures = async () => {
+    try {
+      console.log('📡 Loading fixtures from FPL API...');
+      const fixturesData = await apiService.getFixtures();
+      console.log('📊 Raw fixtures data:', fixturesData);
+      
+      // Transform and select 5 random upcoming fixtures
+      const transformedFixtures = fixturesData
+        .filter(f => f.status === 'upcoming')
+        .slice(0, 20); // Get first 20 to randomize from
+      
+      console.log('🎯 Filtered upcoming fixtures:', transformedFixtures);
+      
+      const shuffled = [...transformedFixtures].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 5);
+      console.log('🎲 Selected fixtures for game:', selected);
+      
+      setSelectedMatches(selected);
+    } catch (error) {
+      console.error('❌ Failed to load fixtures from API, using mock data:', error);
+      // Fallback to mock data
+      const shuffled = [...MOCK_FIXTURES].sort(() => 0.5 - Math.random());
+      setSelectedMatches(shuffled.slice(0, 5));
+    }
+  };
+
+  const handlePrediction = (matchId: string, prediction: 'home' | 'draw' | 'away') => {
+    setPredictions(prev => {
+      const filtered = prev.filter(p => p.matchId !== matchId);
+      return [...filtered, { matchId, prediction }];
+    });
+  };
+
+  const calculateScores = () => {
+    let userPoints = 0;
+    let gafferPoints = 0;
+
+    predictions.forEach(pred => {
+      // Mock result calculation (random for demo)
+      const mockResult = Math.random() > 0.5 ? 'home' : Math.random() > 0.5 ? 'draw' : 'away';
+      
+      if (pred.prediction === mockResult) {
+        userPoints += 2; // 2 points for correct prediction
+      }
+      
+      const gafferPred = GAFFER_PREDICTIONS[pred.matchId as keyof typeof GAFFER_PREDICTIONS];
+      if (gafferPred === mockResult) {
+        gafferPoints += 2;
+      }
+    });
+
+    setUserScore(userPoints);
+    setGafferScore(gafferPoints);
+  };
+
+  const handleCompleteGame = () => {
+    if (predictions.length === 5) {
+      calculateScores();
+      // Mark this email as played for the week
+      if (userProfile.email) {
+        markAsPlayed(userProfile.email);
+      }
+      setGameState('results');
+    }
+  };
+
+  // Newsletter signup function
+  const signupForNewsletter = async (email: string, name: string, club: string) => {
+    try {
+      // TODO: Replace with your actual newsletter API endpoint
+      // For now, we'll simulate the API call
+      console.log('Newsletter signup:', { email, name, club });
+      
+      // Example of what the API call would look like:
+      // const response = await fetch('/api/newsletter/signup', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ email, name, club, tier: 'free' })
+      // });
+      
+      return true;
+    } catch (error) {
+      console.error('Newsletter signup failed:', error);
+      return false;
+    }
+  };
+
+  const handleSignup = async () => {
+    // Validate email
+    if (!isValidEmail(userProfile.email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    if (userProfile.name && userProfile.email && userProfile.club && userProfile.country) {
+      try {
+        // Register user with AuthService
+        const user = authService.register(
+          userProfile.email,
+          userProfile.name,
+          userProfile.club
+        );
+        
+        // Sign up for newsletter
+        await signupForNewsletter(
+          userProfile.email,
+          userProfile.name,
+          userProfile.club
+        );
+        
+        setEmailError('');
+        // Check if already played this week
+        if (hasPlayedThisWeek(userProfile.email)) {
+          setGameState('leaderboard');
+        } else {
+          setGameState('playing');
+        }
+      } catch (error) {
+        if (error.message === 'User already exists') {
+          // User already exists, log them in
+          authService.login(userProfile.email);
+          setEmailError('');
+          // Check if already played this week
+          if (hasPlayedThisWeek(userProfile.email)) {
+            setGameState('leaderboard');
+          } else {
+            setGameState('playing');
+          }
+        } else {
+          setEmailError('Registration failed. Please try again.');
+        }
+      }
+    }
+  };
+
+  const handleViewLeaderboard = () => {
+    setGameState('leaderboard');
+  };
+
+  const resetGame = () => {
+    // Check if the current user has already played this week
+    if (userProfile.email && hasPlayedThisWeek(userProfile.email)) {
+      // Already played — redirect to leaderboard
+      setGameState('leaderboard');
+      return;
+    }
+    setGameState('intro');
+    setPredictions([]);
+    setUserScore(0);
+    setGafferScore(0);
+  };
+
+  const getPredictionIcon = (prediction: 'home' | 'draw' | 'away') => {
+    switch (prediction) {
+      case 'home': return '🏠';
+      case 'draw': return '🤝';
+      case 'away': return '✈️';
+      default: return '❓';
+    }
+  };
+
+  const getPredictionText = (prediction: 'home' | 'draw' | 'away', homeTeam: string, awayTeam: string) => {
+    switch (prediction) {
+      case 'home': return homeTeam;
+      case 'draw': return 'Draw';
+      case 'away': return awayTeam;
+      default: return 'Select';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
+          <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 p-6 text-white">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-2">🧠 The Gaffer's Gut</h2>
+                <p className="text-base md:text-lg opacity-90">Test your football knowledge against The Gaffer's predictions</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all transform hover:scale-105 shadow-lg"
+                  title="Learn how to play"
+                >
+                  <i className="fas fa-book-open text-sm"></i>
+                  <span className="text-sm font-bold">Guide</span>
+                </button>
+                <div className="bg-white/20 rounded-lg px-4 py-2 text-center">
+                  <div className="text-2xl font-black">{MOCK_LEADERBOARD.length}</div>
+                  <div className="text-xs opacity-80">Players</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {gameState === 'intro' && (
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold text-primary dark:text-white mb-4">
+                🧠 Beat The Gaffer
+              </h1>
+              <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
+                Can you outsmart The Gaffer? Predict 5 Premier League matches and compete for the weekly leaderboard!
+              </p>
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  🏆 Weekly competition • 📧 Free to enter • 🎯 2 minutes to play
+                </p>
+              </div>
+            </div>
+            
+            {/* How to Play Section - Always Expanded */}
+            <div className="mb-8">
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-6 text-left">
+                <h3 className="font-bold text-xl mb-6 text-primary dark:text-white text-center">🎮 How to Play & Rules</h3>
+                
+                <div className="space-y-6 text-slate-600 dark:text-slate-300">
+                  <div className="flex items-start space-x-4">
+                    <div className="text-2xl flex-shrink-0">1️⃣</div>
+                    <div>
+                      <strong className="text-slate-800 dark:text-slate-200">Sign Up Free:</strong>
+                      <p className="mt-1">Enter your name, email, favorite club, and country to create your profile and join the competition.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="text-2xl flex-shrink-0">2️⃣</div>
+                    <div>
+                      <strong className="text-slate-800 dark:text-slate-200">Predict 5 Matches:</strong>
+                      <p className="mt-1">Each week, predict Home/Draw/Away for 5 random Premier League matches. The Gaffer makes his predictions too!</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="text-2xl flex-shrink-0">3️⃣</div>
+                    <div>
+                      <strong className="text-slate-800 dark:text-slate-200">Score Points:</strong>
+                      <p className="mt-1">Get 2 points for each correct prediction. Maximum 10 points per week. Beat The Gaffer's score for bonus bragging rights!</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="text-2xl flex-shrink-0">4️⃣</div>
+                    <div>
+                      <strong className="text-slate-800 dark:text-slate-200">Weekly Leaderboard:</strong>
+                      <p className="mt-1">Top 5 players announced every Sunday evening. LOG BACK AFTER SUNDAY GAMES to see how you rank against other fans!</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                  <h4 className="font-bold text-yellow-800 dark:text-yellow-200 mb-3">📧 WHAT THE GAFFER SENDS YOU</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-yellow-700 dark:text-yellow-300">
+                    <div className="flex items-center space-x-2">
+                      <span>🏆</span>
+                      <span>WHAT'S HAPPENING IN THE PREMIER LEAGUE</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span>🧠</span>
+                      <span>GAFFER'S INSIGHTS</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span>📊</span>
+                      <span>NEW MATCH PREDICTIONS ANNOUNCEMENT</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span>⚽</span>
+                      <span>TIPS AND TRICKS TO FANTASY LEAGUE PICKS</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-3 text-center">
+                    No spam - just weekly football fun!
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Sample Match Preview */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-primary dark:text-white mb-4 text-center">
+                ⚽ Example Match Prediction
+              </h3>
+              <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
+                    <span className="font-medium text-slate-700 dark:text-slate-200">Manchester City</span>
+                  </div>
+                  <span className="text-slate-500 dark:text-slate-400">vs</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="font-medium text-slate-700 dark:text-slate-200">Liverpool</span>
+                    <div className="w-8 h-8 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
+                  </div>
+                </div>
+                <div className="flex justify-center space-x-2 mt-3">
+                  <button className="px-3 py-1 bg-slate-200 dark:bg-slate-600 rounded text-sm">🏠 Home</button>
+                  <button className="px-3 py-1 bg-slate-200 dark:bg-slate-600 rounded text-sm">🤝 Draw</button>
+                  <button className="px-3 py-1 bg-slate-200 dark:bg-slate-600 rounded text-sm">✈️ Away</button>
+                </div>
+                <div className="text-xs text-center text-slate-500 dark:text-slate-400 mt-2">
+                  🧠 Gaffer predicts: Home
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <button
+                onClick={() => setGameState('signup')}
+                className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg"
+              >
+                📧 Sign Up & Start Playing
+              </button>
+              
+              <button
+                onClick={handleViewLeaderboard}
+                className="w-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 px-6 rounded-lg transition-all"
+              >
+                👀 View Current Leaderboard
+              </button>
+            </div>
+            
+            <div className="mt-8 text-sm text-slate-500 dark:text-slate-400 text-center">
+              <p>📊 Top 5 players announced every Sunday evening</p>
+              <p>🧠 See how you compare against The Gaffer's predictions</p>
+              <p>📧 Join thousands of football fans testing their knowledge!</p>
+            </div>
+          </div>
+        </div>
+        )}
+      </div>
+    );
+  }
+
+  if (gameState === 'signup') {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <h2 className="text-2xl font-bold text-primary dark:text-white mb-6 text-center">
+            📧 Sign Up to Play
+          </h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Your Name
+              </label>
+              <input
+                type="text"
+                value={userProfile.name}
+                onChange={(e) => setUserProfile({...userProfile, name: e.target.value})}
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent"
+                placeholder="John Smith"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={userProfile.email}
+                onChange={(e) => {
+                  setUserProfile({...userProfile, email: e.target.value});
+                  setEmailError(''); // Clear error on change
+                }}
+                className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-accent focus:border-transparent ${
+                  emailError ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
+                }`}
+                placeholder="john@example.com"
+              />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              )}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Favorite Club
+              </label>
+              <ClubDropdown
+                value={userProfile.club}
+                onChange={(club) => setUserProfile({...userProfile, club})}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                Country
+              </label>
+              <CountryDropdown
+                value={userProfile.country}
+                onChange={(country) => setUserProfile({...userProfile, country})}
+              />
+            </div>
+            
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={agreeToEmails}
+                onChange={(e) => setAgreeToEmails(e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="terms" className="text-sm text-slate-600 dark:text-slate-400">
+                I agree to receive weekly results emails
+              </label>
+            </div>
+          </div>
+          
+          <div className="space-y-4 mt-6">
+            <button
+              onClick={handleSignup}
+              disabled={!userProfile.name || !userProfile.email || !userProfile.club || !userProfile.country || !agreeToEmails}
+              className={`w-full py-3 rounded-lg font-bold transition-all ${
+                userProfile.name && userProfile.email && userProfile.club && userProfile.country && agreeToEmails && !emailError
+                  ? 'bg-accent hover:bg-accent/90 text-white shadow-lg transform hover:scale-105'
+                  : 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              🎮 Start Playing
+            </button>
+            
+            <button
+              onClick={() => setGameState('intro')}
+              className="w-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 px-6 rounded-lg transition-all"
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState === 'playing') {
+    return (
+      <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-start justify-center p-4 pt-8">
+        <div className="max-w-4xl w-full">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 mb-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-primary dark:text-white">
+                🧠 Beat The Gaffer - Predict 5 Matches
+              </h2>
+              <div className="text-sm text-slate-600 dark:text-slate-300">
+                {predictions.length}/5 predictions
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              {selectedMatches.map((match, index) => (
+                <div key={match.id} className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-lg font-bold text-slate-700 dark:text-slate-200">
+                        Match {index + 1}
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                        {new Date(match.date).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">
+                      🧠 Gaffer: {getPredictionIcon(GAFFER_PREDICTIONS[match.id as keyof typeof GAFFER_PREDICTIONS])} {getPredictionText(GAFFER_PREDICTIONS[match.id as keyof typeof GAFFER_PREDICTIONS], match.homeTeam, match.awayTeam)}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <LogoWithFallback 
+                        src={getTeamLogo(match.homeTeam)} 
+                        teamName={match.homeTeam} 
+                        size="w-10 h-10 md:w-12 md:h-12" 
+                        className="transition-transform duration-300 group-hover:scale-110 filter drop-shadow-sm group-hover:drop-shadow-md" 
+                      />
+                      <span className="font-medium text-slate-700 dark:text-slate-200">{match.homeTeam}</span>
+                    </div>
+                    
+                    <span className="text-slate-500 dark:text-slate-400 font-heading">vs</span>
+                    
+                    <div className="flex items-center space-x-4">
+                      <span className="font-medium text-slate-700 dark:text-slate-200">{match.awayTeam}</span>
+                      <LogoWithFallback 
+                        src={getTeamLogo(match.awayTeam)} 
+                        teamName={match.awayTeam} 
+                        size="w-10 h-10 md:w-12 md:h-12" 
+                        className="transition-transform duration-300 group-hover:scale-110 filter drop-shadow-sm group-hover:drop-shadow-md" 
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                      {(['home', 'draw', 'away'] as const).map((prediction) => (
+                        <button
+                          key={prediction}
+                          onClick={() => handlePrediction(match.id, prediction)}
+                          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                            predictions.find(p => p.matchId === match.id)?.prediction === prediction
+                              ? 'bg-accent text-white shadow-lg transform scale-105'
+                              : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-500'
+                          }`}
+                        >
+                          {getPredictionIcon(prediction)} {getPredictionText(prediction, match.homeTeam, match.awayTeam)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 flex justify-between items-center">
+              <div className="text-sm text-slate-500 dark:text-slate-400">
+                💡 Tip: The Gaffer gets 2 points for correct predictions. Can you beat the expert?
+              </div>
+              <button
+                onClick={handleCompleteGame}
+                disabled={predictions.length !== 5}
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                  predictions.length === 5
+                    ? 'bg-accent hover:bg-accent/90 text-white shadow-lg transform hover:scale-105'
+                    : 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+                }`}
+              >
+                {predictions.length === 5 ? buttonText : `Make ${5 - predictions.length} more predictions`}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Generate dynamic Gaffer banter based on predictions
+  const generateGafferBanter = (userPreds: any[], gafferPreds: any): string => {
+    const disagreements = userPreds.filter(pred => {
+      const gafferPred = gafferPreds[pred.matchId as keyof typeof gafferPreds];
+      return pred.prediction !== gafferPred;
+    }).length;
+
+    const awayPicks = userPreds.filter(pred => pred.prediction === 'away').length;
+    const homePicks = userPreds.filter(pred => pred.prediction === 'home').length;
+    const drawPicks = userPreds.filter(pred => pred.prediction === 'draw').length;
+
+    // Dynamic banter based on user's actual choices
+    if (disagreements === 0) {
+      return "Great minds think alike! Though I've been doing this since you were in short trousers. Copycat!";
+    } else if (disagreements === 1) {
+      return "Only one disagreement? Playing it safe are we? One brave pick amongst the sheep following the shepherd!";
+    } else if (disagreements === 2) {
+      return "Going against the gaffer twice! Either you're a genius or you'll be buying the pies this weekend. Bold!";
+    } else if (disagreements >= 3) {
+      return "Three or more disagreements? You've got bigger cojones than a bull in a china shop! Respect the confidence, son!";
+    }
+
+    if (awayPicks >= 3) {
+      return "Backing all the away teams? Either you've got inside information or you're just plain daft! Away wins are for gamblers!";
+    }
+
+    if (homePicks >= 4) {
+      return "Playing it safe with all the home wins? No imagination, son! Sometimes you've got to take a chance or you'll never beat the gaffer!";
+    }
+
+    if (drawPicks >= 3) {
+      return "Three or more draws? Sitting on the fence are we? Make a decision! Draws are for people who can't make their mind up!";
+    }
+
+    return "Interesting picks... I've seen worse, but not many! Let's see if your bravery pays off or if you're just helping my pension fund!";
+  };
+
+  // Calculate risk level based on predictions
+  const calculateRiskLevel = (userPreds: any[]): string => {
+    const awayPicks = userPreds.filter(pred => pred.prediction === 'away').length;
+    const disagreements = userPreds.filter(pred => {
+      const gafferPred = GAFFER_PREDICTIONS[pred.matchId as keyof typeof GAFFER_PREDICTIONS];
+      return pred.prediction !== gafferPred;
+    }).length;
+
+    if (awayPicks >= 3 || disagreements >= 3) return "BOLD ⚡⚡⚡";
+    if (awayPicks >= 2 || disagreements >= 2) return "ADVENTUROUS ⚡⚡";
+    if (awayPicks >= 1 || disagreements >= 1) return "CAUTIOUS ⚡";
+    return "CONSERVATIVE 😴";
+  };
+
+  if (gameState === 'results') {
+
+  const beatGaffer = userScore > gafferScore;
+    
+    return (
+      <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-start justify-center p-4 pt-8">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 text-center">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-primary dark:text-white mb-4">
+                🧠 The Gaffer's Pre-Match Analysis
+              </h2>
+              
+              {/* Dynamic Gaffer Analysis */}
+              <div className="bg-orange-100 dark:bg-orange-900/30 rounded-lg p-4 mb-6">
+                <div className="text-2xl mb-2">🧠</div>
+                <div className="text-lg font-bold text-orange-800 dark:text-orange-200">
+                  The Gaffer's Verdict
+                </div>
+                
+                <div className="text-sm text-orange-700 dark:text-orange-300 mb-3">
+                  Your Risk Level: {calculateRiskLevel(predictions)}
+                </div>
+                
+                <div className="text-xs text-orange-600 dark:text-orange-400 italic">
+                  "{generateGafferBanter(predictions, GAFFER_PREDICTIONS)}"
+                </div>
+              </div>
+              
+              {/* Prediction Breakdown */}
+              <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 mb-6">
+                <div className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">
+                  📊 Prediction Breakdown:
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {predictions.filter(p => p.prediction === 'home').length}
+                    </div>
+                    <div className="text-xs text-blue-800 dark:text-blue-200">
+                      Home Wins
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {predictions.filter(p => p.prediction === 'draw').length}
+                    </div>
+                    <div className="text-xs text-green-800 dark:text-green-200">
+                      Draws
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      {predictions.filter(p => p.prediction === 'away').length}
+                    </div>
+                    <div className="text-xs text-red-800 dark:text-red-200">
+                      Away Wins
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-slate-600 dark:text-slate-300 mb-4">
+                  📅 COME BACK SUNDAY NIGHT TO SEE IF YOU BEAT THE GAFFER!
+                </p>
+                <button
+                  onClick={resetGame}
+                  className="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-6 rounded-lg transition-all"
+                >
+                  🔄 Play Again
+                </button>
+              </div>
+            </div>
+            
+            {/* Sunday Message */}
+            <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 mb-6">
+              <p className="text-slate-700 dark:text-slate-200 font-medium">
+                📅 CHECK BACK SUNDAY NIGHT IF YOU MADE IT TO THE LEADERBOARD AND BEAT THE GAFFER!
+              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
+                The Gaffer will announce the top 5 performers after all Sunday games are finished.
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <button
+                onClick={() => setGameState('leaderboard')}
+                className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-4 px-6 rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg"
+              >
+                🏆 View Current Leaderboard
+              </button>
+              
+              <button
+                onClick={resetGame}
+                className="w-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 px-6 rounded-lg transition-all"
+              >
+                🔄 Play Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState === 'leaderboard') {
+    return (
+      <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-start justify-center p-4 pt-8">
+        <div className="max-w-4xl w-full">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8">
+            <h2 className="text-3xl font-bold text-primary dark:text-white mb-8 text-center">
+              🏆 Weekly Leaderboard
+            </h2>
+            
+            {/* Gaffer's Score Section */}
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 mb-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="text-4xl">🧠</div>
+                  <div>
+                    <div className="text-xl font-bold text-purple-800 dark:text-purple-200">
+                      The Gaffer
+                    </div>
+                    <div className="text-sm text-purple-600 dark:text-purple-300">
+                      Expert Predictor
+                    </div>
+                    <div className="text-xs text-purple-500 dark:text-purple-400 mt-1 italic">
+                      "Look, I can't play for them... but I'm usually right. Usually."
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                    {gafferScore}
+                  </div>
+                  <div className="text-sm text-purple-600 dark:text-purple-300">
+                    Points
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Top 5 Users */}
+            <div className="space-y-3">
+              {MOCK_LEADERBOARD.map((entry) => (
+                <div key={entry.rank} className={`flex items-center justify-between p-4 rounded-lg ${
+                  entry.rank === 1 ? 'bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400' :
+                  entry.rank === 2 ? 'bg-slate-100 dark:bg-slate-700' :
+                  entry.rank === 3 ? 'bg-orange-50 dark:bg-orange-900/20' :
+                  'bg-slate-50 dark:bg-slate-800'
+                }`}>
+                  <div className="flex items-center space-x-4">
+                    <div className={`text-2xl font-bold ${
+                      entry.rank === 1 ? 'text-yellow-600 dark:text-yellow-400' :
+                      entry.rank === 2 ? 'text-slate-600 dark:text-slate-400' :
+                      entry.rank === 3 ? 'text-orange-600 dark:text-orange-400' :
+                      'text-slate-500 dark:text-slate-400'
+                    }`}>
+                      #{entry.rank}
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      {/* National Flag in Circle */}
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 flex items-center justify-center ring-2 ring-slate-200 dark:ring-slate-600">
+                          <img 
+                            src={COUNTRY_FLAGS[entry.country] || 'https://flagcdn.com/w40/gb.png'} 
+                            alt={entry.country}
+                            className="w-full h-full object-cover"
+                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                              e.currentTarget.src = 'https://flagcdn.com/w40/gb.png';
+                            }}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Club Logo */}
+                      <LogoWithFallback 
+                        src={getTeamLogo(entry.club)} 
+                        teamName={entry.club} 
+                        size="w-10 h-10" 
+                        className="ring-2 ring-slate-200 dark:ring-slate-600" 
+                      />
+                      
+                      <div>
+                        <div className="font-bold text-slate-800 dark:text-slate-200">
+                          {entry.name}
+                        </div>
+                        <div className="text-sm text-slate-600 dark:text-slate-400">
+                          {entry.club}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4">
+                    {entry.beatGaffer && (
+                      <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-2 py-1 rounded text-xs font-bold">
+                        🧠 Beat Gaffer!
+                      </div>
+                    )}
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                        {entry.points}
+                      </div>
+                      <div className="text-xs text-slate-600 dark:text-slate-400">
+                        points
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* User's Position */}
+            {userProfile.name && (
+              <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                      <img 
+                        src={COUNTRY_FLAGS[userProfile.country] || 'https://flagcdn.com/w40/gb.png'} 
+                        alt={userProfile.country}
+                        className="w-full h-full object-cover"
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                          e.currentTarget.src = 'https://flagcdn.com/w40/gb.png';
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <div className="font-bold text-blue-800 dark:text-blue-200">
+                        Your Position
+                      </div>
+                      <div className="text-sm text-blue-600 dark:text-blue-300">
+                        {userProfile.name} ({userProfile.club})
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {userScore}
+                    </div>
+                    <div className="text-xs text-blue-600 dark:text-blue-300">
+                      points
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-8 text-center">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                📧 Weekly results emailed every Sunday evening
+              </p>
+              <button
+                onClick={resetGame}
+                className="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105"
+              >
+                🎮 Play Again Next Week
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default BeatTheGafferNew;

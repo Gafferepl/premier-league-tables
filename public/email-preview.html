@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Templates Preview - Premier League Tables</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Email Templates Data
+        const emails = [
+            { 
+                id: 'free-welcome', 
+                name: 'Free Welcome Email', 
+                description: 'Sent to new free users',
+                icon: '👋'
+            },
+            { 
+                id: 'paid-welcome', 
+                name: 'Paid Welcome Email', 
+                description: 'Sent to new premium subscribers',
+                icon: '👑'
+            },
+            { 
+                id: 'assessment', 
+                name: 'Team Assessment Email', 
+                description: 'Weekly team analysis for premium users',
+                icon: '🏆'
+            },
+            { 
+                id: 'thank-you', 
+                name: 'Thank You Email', 
+                description: 'Payment confirmation for first payment',
+                icon: '✅'
+            },
+            { 
+                id: 'payment-failed', 
+                name: 'Payment Failed Email', 
+                description: 'Sent when payment processing fails',
+                icon: '⚠️'
+            },
+            { 
+                id: 'cancellation', 
+                name: 'Cancellation Email', 
+                description: 'Sent when user cancels subscription',
+                icon: '😔'
+            },
+            { 
+                id: 'unsubscribe', 
+                name: 'Unsubscribe Confirmation', 
+                description: 'Sent when user unsubscribes from marketing',
+                icon: '📧'
+            },
+        ];
+
+        // Sample data for templates
+        const sampleData = {
+            name: 'Alex Ferguson',
+            email: 'alex@premierleaguetables.com',
+            plan: 'Pro',
+            amount: '£9.99',
+            last4: '4242',
+            attemptDate: 'March 4, 2026',
+            cancellationDate: 'March 4, 2026',
+            refundInfo: 'March 31, 2026',
+            unsubscribeDate: 'March 4, 2026',
+            nextBilling: 'April 2, 2026',
+            assessmentData: {
+                overallRating: 7.8,
+                attackStrength: 8.2,
+                defenseRating: 7.1,
+                budgetEfficiency: 8.5,
+                recommendations: [
+                    "Upgrade your defense - weak link costing points",
+                    "Consider transferring underperforming midfielder",
+                    "Your bench is weak - need better coverage"
+                ],
+                captainPick: "Your top striker has favorable fixtures",
+                weakLinks: ["Defense position 3", "Midfielder on bench"],
+                tacticalAdvice: "Focus on clean sheet bonuses this week",
+                gameweek: 15
+            }
+        };
+
+        // Email Templates Components
+        const FreeWelcomeEmail = ({ name, email }) => (
+            <div style={{ fontFamily: 'Inter, sans-serif', maxWidth: '600px', margin: '0 auto', backgroundColor: '#ffffff' }}>
+                <div style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', padding: '30px 20px', textAlign: 'center', borderRadius: '12px 12px 0 0' }}>
+                    <h1 style={{ margin: '0', fontSize: '32px', fontWeight: 'bold', color: '#ffffff' }}>Welcome to Premier League Tables! 🏆</h1>
+                    <p style={{ margin: '10px 0 0 0', fontSize: '18px', color: '#ffffff', opacity: 0.9 }}>Your Fantasy Football Journey Starts Here</p>
+                </div>
+                <div style={{ padding: '30px 20px', backgroundColor: '#ffffff', borderRadius: '0 0 12px 12px' }}>
+                    <h2 style={{ color: '#1f2937', margin: '0 0 15px 0', fontSize: '24px' }}>Hi {name}! 👋</h2>
+                    <p style={{ color: '#4b5563', lineHeight: '1.6', margin: '0 0 20px 0' }}>Welcome to the Premier League Tables! You've successfully joined our community of passionate fantasy football managers.</p>
+                    <div style={{ background: '#f3f4f6', padding: '20px', borderRadius: '8px', margin: '20px 0' }}>
+                        <h3 style={{ color: '#1f2937', margin: '0 0 10px 0', fontSize: '18px' }}>What's Included in Your Free Plan:</h3>
+                        <ul style={{ color: '#4b5563', margin: '0', paddingLeft: '20px' }}>
+                            <li style={{ marginBottom: '8px' }}>📊 Access to basic league tables</li>
+                            <li style={{ marginBottom: '8px' }}>📅 View upcoming fixtures</li>
+                            <li style={{ marginBottom: '8px' }}>📰 Weekly newsletter updates</li>
+                            <li style={{ marginBottom: '8px' }}>🏆 Basic player statistics</li>
+                        </ul>
+                    </div>
+                    <div style={{ textAlign: 'center', margin: '30px 0' }}>
+                        <a href="#" style={{ display: 'inline-block', background: '#3b82f6', color: '#ffffff', padding: '12px 24px', textDecoration: 'none', borderRadius: '6px', fontWeight: '600' }}>Get Started →</a>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const AssessmentEmail = ({ name, email, assessmentData }) => {
+            const { overallRating, attackStrength, defenseRating, budgetEfficiency, recommendations, captainPick, weakLinks, tacticalAdvice, gameweek } = assessmentData;
+            
+            return (
+                <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', maxWidth: '600px', margin: '0 auto', backgroundColor: '#0f172a', color: '#ffffff' }}>
+                    {/* Header */}
+                    <div style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ea580c 100%)', padding: '30px 20px', textAlign: 'center', borderRadius: '12px 12px 0 0', position: 'relative' }}>
+                        <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '12px', opacity: '0.7' }}>
+                            Week {gameweek} Assessment
+                        </div>
+                        <h1 style={{ margin: '0', fontSize: '32px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+                            🏆 The Gaffer's Analysis
+                        </h1>
+                        <p style={{ margin: '0', fontSize: '16px', opacity: '0.9', fontWeight: '500' }}>
+                            Your Personal Team Breakdown
+                        </p>
+                    </div>
+
+                    {/* Main Content */}
+                    <div style={{ backgroundColor: '#1e293b', padding: '30px 20px', borderRadius: '0 0 12px 12px' }}>
+                        {/* Personal Greeting */}
+                        <div style={{ marginBottom: '30px' }}>
+                            <h2 style={{ color: '#fbbf24', margin: '0 0 10px 0', fontSize: '20px', fontWeight: '700' }}>
+                                Oi {name}! The Gaffer's been watching your squad...
+                            </h2>
+                            <p style={{ color: '#94a3b8', margin: '0', fontSize: '14px', lineHeight: '1.6' }}>
+                                Here's your weekly tactical breakdown. No fluff, just proper analysis that'll help you smash your mini-league.
+                            </p>
+                        </div>
+
+                        {/* Team Rating Card */}
+                        <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', padding: '25px', borderRadius: '12px', marginBottom: '25px', border: '2px solid #dc2626', boxShadow: '0 4px 20px rgba(220, 38, 38, 0.2)' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                <h3 style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '24px', fontWeight: '800' }}>
+                                    Team Rating: {overallRating}/10
+                                </h3>
+                            </div>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                <div>
+                                    <div style={{ marginBottom: '15px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                            <h4 style={{ color: '#ef4444', margin: '0', fontSize: '14px', fontWeight: '600' }}>⚽ Attack</h4>
+                                            <span style={{ color: '#ef4444', fontSize: '14px', fontWeight: '700' }}>{attackStrength}/10</span>
+                                        </div>
+                                        <div style={{ background: '#334155', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ background: 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)', width: `${attackStrength * 10}%`, height: '100%', borderRadius: '3px' }}></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                            <h4 style={{ color: '#10b981', margin: '0', fontSize: '14px', fontWeight: '600' }}>🛡️ Defense</h4>
+                                            <span style={{ color: '#10b981', fontSize: '14px', fontWeight: '700' }}>{defenseRating}/10</span>
+                                        </div>
+                                        <div style={{ background: '#334155', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)', width: `${defenseRating * 10}%`, height: '100%', borderRadius: '3px' }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div style={{ marginBottom: '15px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                            <h4 style={{ color: '#f59e0b', margin: '0', fontSize: '14px', fontWeight: '600' }}>💰 Budget</h4>
+                                            <span style={{ color: '#f59e0b', fontSize: '14px', fontWeight: '700' }}>{budgetEfficiency}/10</span>
+                                        </div>
+                                        <div style={{ background: '#334155', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)', width: `${budgetEfficiency * 10}%`, height: '100%', borderRadius: '3px' }}></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                            <h4 style={{ color: '#06b6d4', margin: '0', fontSize: '14px', fontWeight: '600' }}>📊 Overall</h4>
+                                            <span style={{ color: '#06b6d4', fontSize: '14px', fontWeight: '700' }}>{overallRating}/10</span>
+                                        </div>
+                                        <div style={{ background: '#334155', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ background: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)', width: `${overallRating * 10}%`, height: '100%', borderRadius: '3px' }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recommendations */}
+                        <div style={{ background: 'linear-gradient(135deg, #451a03 0%, #78350f 100%)', padding: '20px', borderRadius: '12px', marginBottom: '25px', borderLeft: '4px solid #f59e0b' }}>
+                            <h3 style={{ color: '#fbbf24', margin: '0 0 15px 0', fontSize: '18px', fontWeight: '700' }}>
+                                🎯 Gaffer's Recommendations:
+                            </h3>
+                            <ul style={{ color: '#fef3c7', margin: '0', paddingLeft: '20px', fontSize: '14px', lineHeight: '1.6' }}>
+                                {recommendations.map((rec, index) => (
+                                    <li key={index} style={{ marginBottom: '8px' }}>{rec}</li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Captain Pick */}
+                        <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)', padding: '20px', borderRadius: '12px', marginBottom: '25px', borderLeft: '4px solid #10b981' }}>
+                            <h3 style={{ color: '#34d399', margin: '0 0 10px 0', fontSize: '18px', fontWeight: '700' }}>
+                                💡 Captain Pick This Week:
+                            </h3>
+                            <p style={{ color: '#d1fae5', margin: '0', fontSize: '16px', fontWeight: '600', lineHeight: '1.5' }}>
+                                {captainPick}
+                            </p>
+                        </div>
+
+                        {/* Weak Links */}
+                        {weakLinks.length > 0 && (
+                            <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)', padding: '20px', borderRadius: '12px', marginBottom: '25px', borderLeft: '4px solid #ef4444' }}>
+                                <h3 style={{ color: '#fca5a5', margin: '0 0 15px 0', fontSize: '18px', fontWeight: '700' }}>
+                                    ⚠️ Weak Links to Fix:
+                                </h3>
+                                <ul style={{ color: '#fecaca', margin: '0', paddingLeft: '20px', fontSize: '14px', lineHeight: '1.6' }}>
+                                    {weakLinks.map((link, index) => (
+                                        <li key={index} style={{ marginBottom: '8px' }}>{link}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Tactical Advice */}
+                        <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)', padding: '20px', borderRadius: '12px', marginBottom: '25px' }}>
+                            <h3 style={{ color: '#93c5fd', margin: '0 0 15px 0', fontSize: '18px', fontWeight: '700' }}>
+                                📋 Gaffer's Tactical Advice:
+                            </h3>
+                            <p style={{ color: '#dbeafe', margin: '0', fontSize: '14px', lineHeight: '1.6' }}>
+                                {tacticalAdvice}
+                            </p>
+                        </div>
+
+                        {/* Call to Action */}
+                        <div style={{ textAlign: 'center', marginTop: '30px' }}>
+                            <a href="https://premierleaguetables.com" style={{ display: 'inline-block', background: 'linear-gradient(135deg, #dc2626 0%, #ea580c 100%)', color: '#ffffff', padding: '15px 30px', textDecoration: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '0 4px 20px rgba(220, 38, 38, 0.3)', transition: 'all 0.3s ease' }}>
+                                View Full Analysis →
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div style={{ background: '#0f172a', color: '#64748b', padding: '20px', textAlign: 'center', borderTop: '1px solid #334155' }}>
+                        <p style={{ margin: '0 0 10px 0', fontSize: '14px', fontWeight: '600', color: '#fbbf24', fontStyle: 'italic' }}>
+                            "Oi! Follow the Gaffer's advice and you'll win your league. No excuses."
+                        </p>
+                        <p style={{ margin: '0', fontSize: '12px' }}>
+                            The Gaffer's Hub | Premium Fantasy Football Analysis
+                        </p>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '11px', opacity: '0.7' }}>
+                            <h1>Premier League Tables - Email Template Gallery</h1> 2026 Premier League Tables. All rights reserved.
+                        </p>
+                    </div>
+                </div>
+            );
+        };
+
+        const PaidWelcomeEmail = ({ name, email, plan }) => (
+            <div style={{ fontFamily: 'Inter, sans-serif', maxWidth: '600px', margin: '0 auto', backgroundColor: '#ffffff' }}>
+                <div style={{ background: 'linear-gradient(135deg, #dc2626 0%, #ea580c 100%)', padding: '30px 20px', textAlign: 'center', borderRadius: '12px 12px 0 0' }}>
+                    <h1 style={{ margin: '0', fontSize: '32px', fontWeight: 'bold', color: '#ffffff' }}>👑 Welcome to Premium!</h1>
+                    <p style={{ margin: '10px 0 0 0', fontSize: '18px', color: '#ffffff', opacity: 0.9 }}>Your Fantasy Football Upgrade</p>
+                </div>
+                <div style={{ padding: '30px 20px', backgroundColor: '#ffffff', borderRadius: '0 0 12px 12px' }}>
+                    <h2 style={{ color: '#1f2937', margin: '0 0 15px 0', fontSize: '24px' }}>Hi {name}! 🎉</h2>
+                    <p style={{ color: '#4b5563', lineHeight: '1.6', margin: '0 0 20px 0' }}>Congratulations on upgrading to our Premium plan! You now have access to all our advanced features.</p>
+                    <div style={{ background: '#fef3c7', padding: '20px', borderRadius: '8px', margin: '20px 0', borderLeft: '4px solid #f59e0b' }}>
+                        <h3 style={{ color: '#92400e', margin: '0 0 10px 0', fontSize: '18px' }}>🏆 Premium Features Unlocked:</h3>
+                        <ul style={{ color: '#78350f', margin: '0', paddingLeft: '20px' }}>
+                            <li style={{ marginBottom: '8px' }}>📊 Advanced team analysis</li>
+                            <li style={{ marginBottom: '8px' }}>🎯 Weekly assessment emails</li>
+                            <li style={{ marginBottom: '8px' }}>💰 Budget optimization tools</li>
+                            <li style={{ marginBottom: '8px' }}>⚽ Player comparison tools</li>
+                        </ul>
+                    </div>
+                    <div style={{ textAlign: 'center', margin: '30px 0' }}>
+                        <a href="#" style={{ display: 'inline-block', background: '#dc2626', color: '#ffffff', padding: '12px 24px', textDecoration: 'none', borderRadius: '6px', fontWeight: '600' }}>Access Premium Features →</a>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // Main App Component
+        function EmailPreviewApp() {
+            const [selectedEmail, setSelectedEmail] = useState(emails[0]);
+            const [isLoading, setIsLoading] = useState(false);
+            const [password, setPassword] = useState('');
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+            const correctPassword = 'ellerkerdavid@gmail.com';
+
+            const handlePasswordSubmit = () => {
+                if (password === correctPassword) {
+                    setIsAuthenticated(true);
+                } else {
+                    alert('Incorrect password. Please try again.');
+                }
+            };
+
+            const renderEmailComponent = () => {
+                switch (selectedEmail.id) {
+                    case 'free-welcome':
+                        return <FreeWelcomeEmail {...sampleData} />;
+                    case 'paid-welcome':
+                        return <PaidWelcomeEmail {...sampleData} />;
+                    case 'assessment':
+                        return <AssessmentEmail {...sampleData} />;
+                    default:
+                        return <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h3>Email template coming soon...</h3>
+                        </div>;
+                }
+            };
+
+            if (!isAuthenticated) {
+                return (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
+                        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)', maxWidth: '400px', width: '100%' }}>
+                            <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#1f2937' }}>🔒 Email Preview Access</h1>
+                            <p style={{ textAlign: 'center', marginBottom: '30px', color: '#6b7280' }}>Enter password to access email templates</p>
+                            <input 
+                                type="password" 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter password..."
+                                style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: '6px', marginBottom: '20px', fontSize: '16px' }}
+                                onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                            />
+                            <button 
+                                onClick={handlePasswordSubmit}
+                                style={{ width: '100%', background: '#3b82f6', color: '#ffffff', padding: '12px', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}
+                            >
+                                Access Templates
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div style={{ display: 'flex', height: '100vh', fontFamily: 'Inter, sans-serif' }}>
+                    {/* Sidebar */}
+                    <div style={{ width: '320px', background: '#f8fafc', padding: '20px', overflow: 'auto', borderRight: '1px solid #e5e7eb' }}>
+                        <div style={{ marginBottom: '30px' }}>
+                            <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                📧 PL Hub Email Templates
+                            </h1>
+                            <p style={{ color: '#6b7280', fontSize: '14px', lineHeight: '1.5' }}>
+                                Click any template to preview. All emails are fully responsive and branded.
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '20px' }}>
+                            <h3 style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+                                Available Templates
+                            </h3>
+                        </div>
+
+                        {emails.map((email) => (
+                            <button
+                                key={email.id}
+                                onClick={() => {
+                                    setSelectedEmail(email);
+                                    setIsLoading(true);
+                                    setTimeout(() => setIsLoading(false), 500);
+                                }}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '16px',
+                                    marginBottom: '8px',
+                                    background: selectedEmail.id === email.id 
+                                        ? 'linear-gradient(135deg, #1e40af, #3b82f6)' 
+                                        : 'white',
+                                    color: selectedEmail.id === email.id ? 'white' : '#1f2937',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '12px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: selectedEmail.id === email.id 
+                                        ? '0 4px 12px rgba(30, 64, 175, 0.2)' 
+                                        : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ fontSize: '24px' }}>
+                                        {email.icon}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '600', fontSize: '14px', marginBottom: '2px' }}>
+                                            {email.name}
+                                        </div>
+                                        <div style={{ fontSize: '12px', opacity: selectedEmail.id === email.id ? 0.9 : 0.7, lineHeight: '1.4' }}>
+                                            {email.description}
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Preview Area */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f3f4f6' }}>
+                        {/* Header */}
+                        <div style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white', padding: '20px 30px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div>
+                                <h2 style={{ margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    {selectedEmail.icon} {selectedEmail.name}
+                                </h2>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '14px', opacity: 0.9 }}>
+                                    {selectedEmail.description}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {/* Email Preview */}
+                        <div style={{ flex: 1, padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {isLoading && (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                                    <div style={{ width: '40px', height: '40px', border: '3px solid #e5e7eb', borderTop: '3px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                                    <p style={{ color: '#6b7280', fontSize: '14px' }}>Loading template...</p>
+                                </div>
+                            )}
+                            
+                            <div style={{
+                                background: 'white',
+                                borderRadius: '12px',
+                                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                                height: isLoading ? '0' : 'calc(100vh - 180px)',
+                                width: '100%',
+                                maxWidth: '800px',
+                                overflow: 'hidden',
+                                opacity: isLoading ? 0 : 1,
+                                transition: 'opacity 0.3s ease'
+                            }}>
+                                <div style={{ width: '100%', height: '100%', overflow: 'auto', padding: '20px' }}>
+                                    {renderEmailComponent()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>{`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}</style>
+                </div>
+                
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<EmailPreviewApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
