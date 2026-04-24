@@ -2,7 +2,7 @@
 // Handles automated tasks for league management
 
 import { leagueLotteryService } from './leagueLotteryService';
-import { leagueEmailService } from './leagueEmailService';
+// import { leagueEmailService } from './leagueEmailService';
 
 class LeagueScheduler {
   /**
@@ -20,7 +20,7 @@ class LeagueScheduler {
       
       // 2. Send selection emails
       // console.log('📧 Step 2: Sending selection emails...');
-      await leagueEmailService.sendAllLotteryEmails();
+      // await leagueEmailService.sendAllLotteryEmails();
       
       // 3. Log results
       // console.log('✅ === LOTTERY COMPLETE ===');
@@ -61,7 +61,7 @@ class LeagueScheduler {
     // console.log('📧 Sending reminder emails...');
     
     try {
-      const result = await leagueEmailService.sendReminderEmails();
+      // const result = await leagueEmailService.sendReminderEmails();
       // console.log(`✅ Sent ${result.sent} reminders, ${result.failed} failed`);
     } catch (error) {
       // console.error('❌ Error sending reminders:', error);
