@@ -11,7 +11,7 @@ import GafferTip from './components/GafferTip';
 import FactDisplay from './components/FactDisplay'; 
 import GafferInstallPrompt from './components/GafferInstallPrompt';
 import BeatTheGafferNew from './components/BeatTheGafferNew';
-import SimpleNewsletterEditor from './components/SimpleNewsletterEditor';
+// import SimpleNewsletterEditor from './components/SimpleNewsletterEditor';
 import UserRegistration from './components/UserRegistration';
 import CookieConsent from './components/CookieConsent';
 import ModernAffiliateBanner from './components/ModernAffiliateBanner';
@@ -34,7 +34,7 @@ import GoogleAnalytics2026 from './components/GoogleAnalytics2026';
 import { supabase } from './services/supabase';
 import { authService, User } from './services/auth';
 import { apiService } from './services/apiService';
-import DataUpdater from './services/dataUpdater';
+// import DataUpdater from './services/dataUpdater';
 import { backupService } from './services/backupService';
 import { AppData, Fixture } from '../types';
 import { FALLBACK_DATA } from './constants';
@@ -301,8 +301,6 @@ const App: React.FC = () => {
             currentGameweek: currentGW,
             table,
             fixtures: transformedFixtures,
-            players: bootstrapData.elements || [],
-            teams: bootstrapData.teams || [],
             scorers: (bootstrapData.elements || [])
               .filter((p: any) => p.goals_scored > 0)
               .sort((a: any, b: any) => b.goals_scored - a.goals_scored)
@@ -312,7 +310,7 @@ const App: React.FC = () => {
                 team: bootstrapData.teams?.find((t: any) => t.id === p.team)?.name || 'Unknown',
                 goals: p.goals_scored,
                 assists: p.assists,
-                played: p.minutes > 0 ? Math.round(p.minutes / 90) : 0,
+                played: p.minutes > 0 ? ((p.minutes / 90)).toFixed(0) : 0,
                 goalsPer90: p.minutes > 0 ? ((p.goals_scored / p.minutes) * 90).toFixed(2) : '0.00'
               })),
             matchStats: [],
@@ -359,9 +357,10 @@ const App: React.FC = () => {
   };
 
   // Check if we're on the newsletter editor page
-  if (window.location.pathname === '/newsletter-editor') {
-    return <SimpleNewsletterEditor />;
-  }
+  // Temporarily disabled due to build errors
+  // if (window.location.pathname === '/newsletter-editor') {
+  //   return <SimpleNewsletterEditor />;
+  // }
 
   return (
     <ErrorBoundary>
