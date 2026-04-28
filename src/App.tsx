@@ -1,58 +1,58 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import { SkipNavigation } from '../components/SkipNavigation';
-import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
-import SmartTable from '../components/SmartTable';
-import SmartFixtures from '../components/SmartFixtures';
-import Footer from '../components/Footer';
-import LiveBar from '../components/LiveBar';
-import GafferTip from '../components/GafferTip';
-import FactDisplay from '../components/FactDisplay'; 
-import GafferInstallPrompt from '../components/GafferInstallPrompt';
-import BeatTheGafferNew from '../components/BeatTheGafferNew';
-// import SimpleNewsletterEditor from '../components/SimpleNewsletterEditor';
-import UserRegistration from '../components/UserRegistration';
-import CookieConsent from '../components/CookieConsent';
-import ModernAffiliateBanner from '../components/ModernAffiliateBanner';
-import GafferTrendSquad from '../components/GafferTrendSquad';
-import PlayerDatabase from '../components/PlayerDatabase';
-import SquadBuilder from '../components/SquadBuilder';
-import LivePointsTracker from '../components/LivePointsTracker';
-import AdvancedStats from '../components/AdvancedStats';
-import PricingSection from '../components/PricingSection';
-import CaptainPicks from '../components/CaptainPicks';
-import PriceChangeTracker from '../components/PriceChangeTracker';
-import PlayerComparison from '../components/PlayerComparison';
-import FPLGuide from '../components/FPLGuide';
-import ErrorBoundary from '../components/ErrorBoundary';
-import PerformanceOptimizerSimple from '../components/PerformanceOptimizerSimple';
-import GafferChat from '../components/GafferChat';
-import BackupStatus from '../components/BackupStatus';
-import GoogleAnalytics2026 from '../components/GoogleAnalytics2026';
+import { SkipNavigation } from './components/SkipNavigation';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import SmartTable from './components/SmartTable';
+import SmartFixtures from './components/SmartFixtures';
+import Footer from './components/Footer';
+import LiveBar from './components/LiveBar';
+import GafferTip from './components/GafferTip';
+import FactDisplay from './components/FactDisplay'; 
+import GafferInstallPrompt from './components/GafferInstallPrompt';
+import BeatTheGafferNew from './components/BeatTheGafferNew';
+// import SimpleNewsletterEditor from './components/SimpleNewsletterEditor';
+import UserRegistration from './components/UserRegistration';
+import CookieConsent from './components/CookieConsent';
+import ModernAffiliateBanner from './components/ModernAffiliateBanner';
+import GafferTrendSquad from './components/GafferTrendSquad';
+import PlayerDatabase from './components/PlayerDatabase';
+import SquadBuilder from './components/SquadBuilder';
+import LivePointsTracker from './components/LivePointsTracker';
+import AdvancedStats from './components/AdvancedStats';
+import PricingSection from './components/PricingSection';
+import CaptainPicks from './components/CaptainPicks';
+import PriceChangeTracker from './components/PriceChangeTracker';
+import PlayerComparison from './components/PlayerComparison';
+import FPLGuide from './components/FPLGuide';
+import ErrorBoundary from './components/ErrorBoundary';
+import PerformanceOptimizerSimple from './components/PerformanceOptimizerSimple';
+import GafferChat from './components/GafferChat';
+import BackupStatus from './components/BackupStatus';
+import GoogleAnalytics2026 from './components/GoogleAnalytics2026';
 
-import { supabase } from '../services/supabase';
-import { authService, User } from '../services/auth';
-// import { apiService } from '../services/apiService'; // Disabled - using Supabase only
-// import DataUpdater from '../services/dataUpdater';
-// import { backupService } from '../services/backupService'; // Disabled - was triggering old data paths
-import { AppData, Fixture } from '../../types';
-import { FALLBACK_DATA } from '../constants';
+import { supabase } from './services/supabase';
+import { authService, User } from './services/auth';
+// import { apiService } from './services/apiService'; // Disabled - using Supabase only
+// import DataUpdater from './services/dataUpdater';
+// import { backupService } from './services/backupService'; // Disabled - was triggering old data paths
+import { AppData, Fixture } from '../types';
+import { FALLBACK_DATA } from './constants';
 
 // Import Skeletons
-import SkeletonWinProb from '../components/skeletons/SkeletonWinProb';
-import SkeletonSackZone from '../components/skeletons/SkeletonSackZone';
-import SkeletonTopScorers from '../components/skeletons/SkeletonTopScorers';
-import SkeletonNews from '../components/skeletons/SkeletonNews';
-import SkeletonStats from '../components/skeletons/SkeletonStats';
+import SkeletonWinProb from './components/skeletons/SkeletonWinProb';
+import SkeletonSackZone from './components/skeletons/SkeletonSackZone';
+import SkeletonTopScorers from './components/skeletons/SkeletonTopScorers';
+import SkeletonNews from './components/skeletons/SkeletonNews';
+import SkeletonStats from './components/skeletons/SkeletonStats';
 
 // Lazy Load Heavy Components
-const WinProbability = React.lazy(() => import('../components/WinProbability'));
-const SackZone = React.lazy(() => import('../components/SackZone'));
-const TopScorers = React.lazy(() => import('../components/TopScorers'));
-const StatsCarousel = React.lazy(() => import('../components/StatsCarousel'));
-const Newsletter = React.lazy(() => import('../components/Newsletter'));
-const Support = React.lazy(() => import('../components/Support'));
+const WinProbability = React.lazy(() => import('./components/WinProbability'));
+const SackZone = React.lazy(() => import('./components/SackZone'));
+const TopScorers = React.lazy(() => import('./components/TopScorers'));
+const StatsCarousel = React.lazy(() => import('./components/StatsCarousel'));
+const Newsletter = React.lazy(() => import('./components/Newsletter'));
+const Support = React.lazy(() => import('./components/Support'));
 
 declare global {
   interface Window {
