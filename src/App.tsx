@@ -33,9 +33,9 @@ import GoogleAnalytics2026 from './components/GoogleAnalytics2026';
 
 import { supabase } from './services/supabase';
 import { authService, User } from './services/auth';
-import { apiService } from './services/apiService';
+// import { apiService } from './services/apiService'; // Disabled - using Supabase only
 // import DataUpdater from './services/dataUpdater';
-import { backupService } from './services/backupService';
+// import { backupService } from './services/backupService'; // Disabled - was triggering old data paths
 import { AppData, Fixture } from '../types';
 import { FALLBACK_DATA } from './constants';
 
@@ -66,6 +66,8 @@ const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [data, setData] = useState<AppData>(FALLBACK_DATA);
+  const [rawPlayers, setRawPlayers] = useState<any[]>([]);
+  const [rawTeams, setRawTeams] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showRegistration, setShowRegistration] = useState(false);
 
@@ -103,26 +105,19 @@ const App: React.FC = () => {
      }
   };
 
-  // Initialize backup service
-  useEffect(() => {
-    const initializeBackup = async () => {
-      try {
-        // console.log('🔄 Initializing automated backup service...');
-        await backupService.start();
-        // console.log('✅ Backup service started successfully');
-      } catch (error) {
-        // console.error('❌ Failed to start backup service:', error);
-      }
-    };
-
-    // Start backup service after 5 seconds to allow app to initialize
-    const timer = setTimeout(initializeBackup, 5000);
-
-    return () => {
-      clearTimeout(timer);
-      backupService.stop();
-    };
-  }, []);
+  // Backup service disabled - was triggering old gemini/FPL API data paths
+  // useEffect(() => {
+  //   const initializeBackup = async () => {
+  //     try {
+  //       await backupService.start();
+  //     } catch (error) {}
+  //   };
+  //   const timer = setTimeout(initializeBackup, 5000);
+  //   return () => {
+  //     clearTimeout(timer);
+  //     backupService.stop();
+  //   };
+  // }, []);
 
   // Theme initialization - Dark mode as default
   useEffect(() => {
@@ -318,6 +313,8 @@ const App: React.FC = () => {
             weeklyTip: ''
           };
           setData(supabaseData);
+          setRawPlayers(bootstrapData.elements || []);
+          setRawTeams(bootstrapData.teams || []);
         } else {
           console.log('⚠️ Supabase data not available, using fallback');
           setData(FALLBACK_DATA);
@@ -532,7 +529,7 @@ const App: React.FC = () => {
               Search, filter and analyse every Premier League player with advanced stats and transfer trends
             </p>
           </div>
-          <PlayerDatabase />
+          <PlayerDatabase players={rawPlayers} teams={rawTeams} />
         </div>
       </section>
 

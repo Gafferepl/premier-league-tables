@@ -201,16 +201,18 @@ const AdvancedPerformanceOptimizer: React.FC<Props> = ({
     optimizeImages();
   }, [preloadCriticalResources, optimizeFontLoading, optimizeImages]);
 
-  // Service Worker registration for caching
+  // Service Worker registration disabled - handled by index.html nuclear cache clear
+  // Old sw.js was causing stale cached JS bundles to be served
   useEffect(() => {
-    if ('serviceWorker' in navigator && import.meta.env.PROD) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          // console.log('SW registered: ', registration);
-        })
-        .catch((registrationError) => {
-          // console.log('SW registration failed: ', registrationError);
+    // Unregister any remaining service workers from this component
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          if (registration.active?.scriptURL?.includes('sw.js')) {
+            registration.unregister();
+          }
         });
+      });
     }
   }, []);
 
