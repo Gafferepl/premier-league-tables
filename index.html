@@ -333,30 +333,66 @@
   <script type="module" src="/index.tsx"></script>
 </body>
   <script>
-    // Service Worker Registration for PWA
+    // === NUCLEAR CACHE CLEAR v2 ===
+    // Unregister ALL service workers, clear ALL caches, purge stale localStorage
+    (function() {
+      // 1. Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(registration) {
+            console.log('🧹 Unregistering old SW:', registration.scope);
+            registration.unregister();
+          });
+        });
+      }
+
+      // 2. Clear all Cache API caches
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          names.forEach(function(name) {
+            console.log('🧹 Deleting cache:', name);
+            caches.delete(name);
+          });
+        });
+      }
+
+      // 3. Clear stale localStorage keys that cause old data to persist
+      var staleKeys = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && (
+          key.includes('fpl_') ||
+          key.includes('smart_') ||
+          key.includes('premier_league_hub_data') ||
+          key.includes('enriched_players') ||
+          key.includes('fallback_') ||
+          key.includes('cache_') ||
+          key.includes('gemini') ||
+          key.includes('zero_cost') ||
+          key.includes('league_data') ||
+          key.includes('backup_') ||
+          key.includes('last_good') ||
+          key.includes('position_map')
+        )) {
+          staleKeys.push(key);
+        }
+      }
+      staleKeys.forEach(function(key) {
+        console.log('🧹 Removing stale localStorage:', key);
+        localStorage.removeItem(key);
+      });
+      console.log('✅ Cache purge complete - ' + staleKeys.length + ' stale keys removed');
+    })();
+
+    // Register clean no-cache service worker
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
+      window.addEventListener('load', function() {
         navigator.serviceWorker.register('/service-worker.js')
-          .then((registration) => {
-            console.log('SW registered: ', registration);
-            
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              if (newWorker) {
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New version available, show update notification
-                    if (confirm('New version available! Reload to update?')) {
-                      window.location.reload();
-                    }
-                  }
-                });
-              }
-            });
+          .then(function(registration) {
+            console.log('SW registered (no-cache): ', registration);
           })
-          .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
+          .catch(function(err) {
+            console.log('SW registration failed: ', err);
           });
       });
     }

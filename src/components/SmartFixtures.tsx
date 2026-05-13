@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Fixture } from '../../types';
 import { getTeamLogo } from '../constants';
-import ShareSnapshot from './ShareSnapshot';
+// import ShareSnapshot from './ShareSnapshot';
 import LogoWithFallback from './LogoWithFallback';
 import SkeletonFixtures from './skeletons/SkeletonFixtures';
 import LastFiveGamesHover from './LastFiveGamesHover';
@@ -136,7 +136,7 @@ const SmartFixtures: React.FC<SmartFixturesProps> = ({ data, fallbackEmbedId }) 
 
   return (
     <div ref={containerRef} className="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700 relative">
-      <ShareSnapshot targetRef={containerRef} className="absolute top-3 right-3 z-30" />
+      {/* <ShareSnapshot targetRef={containerRef} className="absolute top-3 right-3 z-30" /> */}
 
       {/* Tab bar */}
       <div className="p-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">

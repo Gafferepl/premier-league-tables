@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { GafferTableEntry } from '../../types';
 import { getTeamLogo } from '../constants';
-import ShareSnapshot from './ShareSnapshot';
+// import ShareSnapshot from './ShareSnapshot';
 import LogoWithFallback from './LogoWithFallback';
 
 interface SmartTableProps {
@@ -102,17 +102,17 @@ const SmartTable: React.FC<SmartTableProps> = ({ data, fallbackEmbedId }) => {
 
   return (
     <div ref={tableRef} className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 ring-1 ring-black/5 transition-colors duration-500 relative">
-      
-      {/* 
+
+      {/*
         Viral Snapshot Integration:
         cropHeight={650} roughly captures the header + top 8-10 teams.
         This fixes the issue of capturing a huge long table that looks bad on social media.
       */}
-      <ShareSnapshot 
-        targetRef={tableRef} 
-        cropHeight={650} 
-        className="absolute top-4 right-4 sm:top-5 sm:right-[380px] z-30" 
-      />
+      {/* <ShareSnapshot
+        targetRef={tableRef}
+        cropHeight={650}
+        className="absolute top-4 right-4 sm:top-5 sm:right-[380px] z-30"
+      /> */}
 
       <div className={`p-4 md:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-200 dark:border-slate-700 transition-colors duration-500 ${isGafferMode ? 'bg-[#1a472a] text-white' : 'bg-slate-50 dark:bg-[#0b1120]'}`}>
          

@@ -11,7 +11,7 @@ import GafferTip from './components/GafferTip';
 import FactDisplay from './components/FactDisplay'; 
 import GafferInstallPrompt from './components/GafferInstallPrompt';
 import BeatTheGafferNew from './components/BeatTheGafferNew';
-import SimpleNewsletterEditor from './components/SimpleNewsletterEditor';
+// import SimpleNewsletterEditor from './components/SimpleNewsletterEditor';
 import UserRegistration from './components/UserRegistration';
 import CookieConsent from './components/CookieConsent';
 import ModernAffiliateBanner from './components/ModernAffiliateBanner';
@@ -31,12 +31,12 @@ import GafferChat from './components/GafferChat';
 import BackupStatus from './components/BackupStatus';
 import GoogleAnalytics2026 from './components/GoogleAnalytics2026';
 
-import { fetchPremierLeagueData } from './services/gemini';
+import { supabase } from './services/supabase';
 import { authService, User } from './services/auth';
-import { apiService } from './services/apiService';
-import DataUpdater from './services/dataUpdater';
-import { backupService } from './services/backupService';
-import { AppData } from '../types';
+// import { apiService } from './services/apiService'; // Disabled - using Supabase only
+// import DataUpdater from './services/dataUpdater';
+// import { backupService } from './services/backupService'; // Disabled - was triggering old data paths
+import { AppData, Fixture } from '../types';
 import { FALLBACK_DATA } from './constants';
 
 // Import Skeletons
@@ -66,6 +66,8 @@ const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [data, setData] = useState<AppData>(FALLBACK_DATA);
+  const [rawPlayers, setRawPlayers] = useState<any[]>([]);
+  const [rawTeams, setRawTeams] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showRegistration, setShowRegistration] = useState(false);
 
@@ -103,26 +105,19 @@ const App: React.FC = () => {
      }
   };
 
-  // Initialize backup service
-  useEffect(() => {
-    const initializeBackup = async () => {
-      try {
-        // console.log('🔄 Initializing automated backup service...');
-        await backupService.start();
-        // console.log('✅ Backup service started successfully');
-      } catch (error) {
-        // console.error('❌ Failed to start backup service:', error);
-      }
-    };
-
-    // Start backup service after 5 seconds to allow app to initialize
-    const timer = setTimeout(initializeBackup, 5000);
-
-    return () => {
-      clearTimeout(timer);
-      backupService.stop();
-    };
-  }, []);
+  // Backup service disabled - was triggering old gemini/FPL API data paths
+  // useEffect(() => {
+  //   const initializeBackup = async () => {
+  //     try {
+  //       await backupService.start();
+  //     } catch (error) {}
+  //   };
+  //   const timer = setTimeout(initializeBackup, 5000);
+  //   return () => {
+  //     clearTimeout(timer);
+  //     backupService.stop();
+  //   };
+  // }, []);
 
   // Theme initialization - Dark mode as default
   useEffect(() => {
@@ -138,58 +133,196 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Fetch Data (tries server first, then fallback)
+  // Helper: Transform FPL API fixtures to App format
+  function transformFPLFixtures(fplFixtures: any[], teams: any[]): Fixture[] {
+    if (!fplFixtures || !teams) return [];
+
+    const teamMap = new Map(teams.map(t => [t.id, t.name]));
+
+    return fplFixtures.map(f => {
+      const homeTeam = teamMap.get(f.team_h) || 'Unknown';
+      const awayTeam = teamMap.get(f.team_a) || 'Unknown';
+
+      // Determine status - use kickoff_time to handle stale cache where finished flag may be wrong
+      const fixtureNow = Date.now();
+      let status: 'upcoming' | 'live' | 'finished' = 'upcoming';
+      if (f.finished) {
+        status = 'finished';
+      } else if (f.started && !f.finished) {
+        status = 'live';
+      } else if (f.kickoff_time) {
+        const kickoffMs = new Date(f.kickoff_time).getTime();
+        if (kickoffMs + (3 * 60 * 60 * 1000) < fixtureNow) {
+          status = 'finished'; // Kickoff was 3+ hours ago - treat as finished even if cache is stale
+        }
+      }
+
+      // Format score if finished
+      let score = undefined;
+      if (f.finished && f.team_h_score !== null && f.team_a_score !== null) {
+        score = `${f.team_h_score} - ${f.team_a_score}`;
+      }
+
+      return {
+        id: String(f.id),
+        homeTeam,
+        awayTeam,
+        time: f.kickoff_time ? new Date(f.kickoff_time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '',
+        date: f.kickoff_time ? new Date(f.kickoff_time).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '',
+        score,
+        status,
+        gameweek: f.event || 0,
+        venue: '',
+        referee: '',
+        difficulty: { overall: 3, att: 3, def: 3 }
+      };
+    });
+  }
+
+  // Helper: Calculate league table from FPL fixtures
+  function calculateTableFromFixtures(teams: any[], fixtures: any[]) {
+    const teamMap = new Map(teams.map(t => [t.id, t.name]));
+    const table = teams.map(team => ({
+      position: 0,
+      team: team.name,
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      gf: 0,
+      ga: 0,
+      gd: 0,
+      points: 0,
+      form: [] as string[]
+    }));
+
+    fixtures.forEach(f => {
+      if (f.finished && f.team_h_score !== null && f.team_a_score !== null) {
+        const homeTeam = table.find(t => t.team === teamMap.get(f.team_h));
+        const awayTeam = table.find(t => t.team === teamMap.get(f.team_a));
+        
+        if (homeTeam && awayTeam) {
+          homeTeam.played++;
+          awayTeam.played++;
+          homeTeam.gf += f.team_h_score;
+          homeTeam.ga += f.team_a_score;
+          awayTeam.gf += f.team_a_score;
+          awayTeam.ga += f.team_h_score;
+
+          if (f.team_h_score > f.team_a_score) {
+            homeTeam.won++;
+            homeTeam.points += 3;
+            homeTeam.form.push('W');
+            awayTeam.lost++;
+            awayTeam.form.push('L');
+          } else if (f.team_h_score < f.team_a_score) {
+            awayTeam.won++;
+            awayTeam.points += 3;
+            awayTeam.form.push('W');
+            homeTeam.lost++;
+            homeTeam.form.push('L');
+          } else {
+            homeTeam.drawn++;
+            awayTeam.drawn++;
+            homeTeam.points += 1;
+            awayTeam.points += 1;
+            homeTeam.form.push('D');
+            awayTeam.form.push('D');
+          }
+        }
+      }
+    });
+
+    table.forEach(t => t.gd = t.gf - t.ga);
+    table.sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      if (b.gd !== a.gd) return b.gd - a.gd;
+      return b.gf - a.gf;
+    });
+    table.forEach((t, i) => t.position = i + 1);
+
+    return table;
+  }
+
+  // Fetch Data from Supabase
   useEffect(() => {
     const loadData = async () => {
       try {
-        // console.log('🎯 Loading data with current gameweek calculation...');
+        console.log('🎯 Supabase-Only Data Loading...');
         
-        // Calculate current gameweek manually since APIs are blocked by CORS
-        const now = new Date();
-        const seasonStart = new Date(2024, 7, 16); // August 16, 2024
-        const weeksPassed = Math.floor((now.getTime() - seasonStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        const currentGameweek = Math.max(1, Math.min(38, weeksPassed + 1));
-        
-        // console.log('✅ Calculated current gameweek:', currentGameweek);
-        
-        // Get existing data but update with current gameweek
-        const fetchedData = await fetchPremierLeagueData();
-        
-        if (fetchedData) {
-          // Update with current gameweek
-          const updatedData = {
-            ...fetchedData,
-            currentGameweek,
-            lastUpdated: Date.now()
+        const [bootstrapResult, fixturesResult] = await Promise.all([
+          supabase.from('fpl_bootstrap_cache').select('data').order('fetched_at', { ascending: false }).limit(1),
+          supabase.from('fpl_fixtures_cache').select('data').order('fetched_at', { ascending: false }).limit(1)
+        ]);
+
+        console.log('📊 Bootstrap result:', bootstrapResult);
+        console.log('📊 Bootstrap error:', bootstrapResult.error);
+        console.log('📊 Fixtures result:', fixturesResult);
+        console.log('📊 Fixtures error:', fixturesResult.error);
+
+        const bootstrapData = bootstrapResult.data?.[0]?.data;
+        const fixturesData = fixturesResult.data?.[0]?.data;
+
+        console.log('📊 Bootstrap data:', bootstrapData);
+        console.log('📊 Fixtures data:', fixturesData);
+
+        if (bootstrapData && fixturesData) {
+          console.log('✅ Supabase data loaded successfully!');
+          console.log('📊 Players:', bootstrapData.elements?.length);
+          console.log('📊 Fixtures:', fixturesData.length);
+
+          // Transform Supabase data to AppData format
+          // Use deadline_time to calculate real current GW - don't rely on stale is_current flag
+          const now = Date.now();
+          const allEvents = bootstrapData.events || [];
+          const passedDeadlines = allEvents
+            .filter((e: any) => e.deadline_time && new Date(e.deadline_time).getTime() <= now)
+            .sort((a: any, b: any) => a.id - b.id);
+          const currentGW = passedDeadlines.length > 0
+            ? passedDeadlines[passedDeadlines.length - 1].id
+            : (allEvents.find((e: any) => e.is_current)?.id || 1);
+          console.log('📅 Current GW from deadline_time:', currentGW);
+
+          // Transform FPL fixtures to App format
+          const transformedFixtures = transformFPLFixtures(fixturesData, bootstrapData.teams || []);
+          console.log('📊 Transformed fixtures:', transformedFixtures.length, 'matches');
+
+          // Generate league table directly from Supabase fixtures
+          const table = calculateTableFromFixtures(bootstrapData.teams || [], fixturesData);
+          console.log('📊 Generated table:', table.length, 'teams');
+
+          const supabaseData: AppData = {
+            lastUpdated: Date.now(),
+            currentGameweek: currentGW,
+            table,
+            fixtures: transformedFixtures,
+            scorers: (bootstrapData.elements || [])
+              .filter((p: any) => p.goals_scored > 0)
+              .sort((a: any, b: any) => b.goals_scored - a.goals_scored)
+              .slice(0, 20)
+              .map((p: any) => ({
+                name: p.web_name,
+                team: bootstrapData.teams?.find((t: any) => t.id === p.team)?.name || 'Unknown',
+                goals: p.goals_scored,
+                assists: p.assists,
+                played: p.minutes > 0 ? ((p.minutes / 90)).toFixed(0) : 0,
+                goalsPer90: p.minutes > 0 ? ((p.goals_scored / p.minutes) * 90).toFixed(2) : '0.00'
+              })),
+            matchStats: [],
+            news: [],
+            weeklyTip: ''
           };
-          setData(updatedData);
-          // console.log('📊 Updated data with current gameweek:', updatedData.currentGameweek);
+          setData(supabaseData);
+          setRawPlayers(bootstrapData.elements || []);
+          setRawTeams(bootstrapData.teams || []);
         } else {
-          // Use fallback data with current gameweek
-          const fallbackWithCurrentGW = {
-            ...FALLBACK_DATA,
-            currentGameweek,
-            lastUpdated: Date.now()
-          };
-          setData(fallbackWithCurrentGW);
-          // console.log('📊 Using fallback with current gameweek:', fallbackWithCurrentGW.currentGameweek);
+          console.log('⚠️ Supabase data not available, using fallback');
+          setData(FALLBACK_DATA);
         }
-        
       } catch (error) {
-        // console.error('❌ Failed to load data:', error);
-        // Fallback to existing data loading
-        const fetchedData = await fetchPremierLeagueData();
-        if (fetchedData) {
-          setData(fetchedData);
-        }
+        console.error('❌ Failed to load Supabase data:', error);
+        setData(FALLBACK_DATA);
       }
-      
-      // Init external widgets if any
-      setTimeout(() => {
-        if (window.FWP && typeof window.FWP.init === 'function') {
-          window.FWP.init();
-        }
-      }, 1000);
     };
 
     loadData();
@@ -221,9 +354,10 @@ const App: React.FC = () => {
   };
 
   // Check if we're on the newsletter editor page
-  if (window.location.pathname === '/newsletter-editor') {
-    return <SimpleNewsletterEditor />;
-  }
+  // Temporarily disabled due to build errors
+  // if (window.location.pathname === '/newsletter-editor') {
+  //   return <SimpleNewsletterEditor />;
+  // }
 
   return (
     <ErrorBoundary>
@@ -395,7 +529,7 @@ const App: React.FC = () => {
               Search, filter and analyse every Premier League player with advanced stats and transfer trends
             </p>
           </div>
-          <PlayerDatabase />
+          <PlayerDatabase players={rawPlayers} teams={rawTeams} />
         </div>
       </section>
 

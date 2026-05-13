@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { leagueLotteryService } from '@/services/leagueLotteryService';
-import { leagueEmailService } from '@/services/leagueEmailService';
+// import { leagueEmailService } from '@/services/leagueEmailService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,9 +37,9 @@ export async function POST(request: NextRequest) {
     // Send selection emails if requested
     if (sendEmails) {
       // console.log('📧 Sending selection emails...');
-      for (const result of results) {
-        await leagueEmailService.sendAllSelectionEmails(result.tier);
-      }
+      // for (const result of results) {
+      //   await leagueEmailService.sendAllSelectionEmails(result.tier);
+      // }
     }
 
     return NextResponse.json({
