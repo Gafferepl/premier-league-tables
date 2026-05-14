@@ -14,8 +14,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-          cache: 'npm'
-
 
       - name: Fetch and cache match stats
         run: node scripts/fetch-match-stats.js --force
