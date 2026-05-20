@@ -2,9 +2,8 @@ name: Fetch Match Stats
 
 on:
   schedule:
-    # 10:30pm BST (9:30pm UTC) every day — after all PL kickoffs are done
     - cron: '30 21 * * *'
-  workflow_dispatch: # allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
   fetch:
